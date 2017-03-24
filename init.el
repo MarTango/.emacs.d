@@ -40,6 +40,7 @@
 ;; General
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
 (ivy-mode)
+(add-to-list 'load-path (concat user-emacs-directory "/lisp"))
 
 ;; Magit
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -68,7 +69,7 @@
 			       "* %?\n\n%^T\n\n")))
 
 ;; Org-gcal
-(load-file (concat user-emacs-directory "/org-gcal-config.el"))
+(require 'init-org-gcal)
 
 ;; PHP
 (add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
@@ -93,7 +94,7 @@
 (add-to-list 'company-backends 'company-tern)
 
 ;; mu4e
-(load-file (concat user-emacs-directory "/mu4e-init.el"))
+(require 'init-mu4e)
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)

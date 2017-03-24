@@ -1,3 +1,5 @@
+;;; init-orgmode --- My org-related settings
+;;; Code:
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
@@ -11,3 +13,10 @@
 			      ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
 			       "* To-Do %?\n %i\n %a")))
 (provide 'init-orgmode)
+
+;;; Commentary:
+
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:
+;;; init-orgmode ends here

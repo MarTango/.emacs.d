@@ -7,4 +7,7 @@
 (provide 'init-js2)
 ;;; Commentary:
 
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:
 ;;; init-js2 ends here

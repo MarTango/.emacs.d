@@ -41,6 +41,7 @@
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
 (ivy-mode)
 (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
+(global-eldoc-mode)
 
 ;; Magit
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -51,7 +52,6 @@
 
 ;; Flycheck
 (global-flycheck-mode t)
-(setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 
 ;; Theme
 (load-theme 'zenburn)
@@ -66,7 +66,9 @@
       org-capture-templates '(("t" "Task" entry (file "~/orgfiles/tasks.org")
 			       "* TODO %?\n  %i\n  %a")
 			      ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-			       "* %?\n\n%^T\n\n")))
+			       "* %?\n\n%^T\n\n")
+			      ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
+			       "* To-Do %?\n %i\n %a")))
 
 ;; Org-gcal
 (require 'init-org-gcal)
@@ -82,6 +84,7 @@
 	    (php-enable-psr2-coding-style)
 	    (php-eldoc-enable)
 	    (setq show-trailing-whitespace nil)))
+(setq phpcbf-standard 'PSR2)
 
 ;; Python
 (elpy-enable)

@@ -57,44 +57,19 @@
 (load-theme 'zenburn)
 
 ;; Org
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-iswitchb)
-(setq org-directory "~/orgfiles"
-      org-default-notes-file (concat org-directory "/notes.org")
-      org-capture-templates '(("t" "Task" entry (file "~/orgfiles/tasks.org")
-			       "* TODO %?\n  %i\n  %a")
-			      ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-			       "* %?\n\n%^T\n\n")
-			      ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
-			       "* To-Do %?\n %i\n %a")))
+(require 'init-orgmode)
 
 ;; Org-gcal
-(require 'init-org-gcal)
+(require 'init-orggcal)
 
 ;; PHP
-(add-to-list 'auto-mode-alist '("\\.php$" . php-mode))
-(require 'php-auto-yasnippets)
-(define-key php-mode-map (kbd "C-c C-y") 'yas/create-php-snippet)
-(add-hook 'php-mode-hook
-	  (lambda ()
-	    (php-refactor-mode)
-	    (ggtags-mode)
-	    (php-enable-psr2-coding-style)
-	    (php-eldoc-enable)
-	    (setq show-trailing-whitespace nil)))
-(setq phpcbf-standard 'PSR2)
+(require 'init-php)
 
 ;; Python
 (elpy-enable)
 
 ;; JavaScript
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(add-to-list 'load-path "/usr/local/lib/node_modules/tern/emacs/")
-(autoload 'tern-mode "tern.el" nil t)
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-(add-to-list 'company-backends 'company-tern)
+(require 'init-js2)
 
 ;; mu4e
 (require 'init-mu4e)
@@ -102,3 +77,4 @@
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
+;;; init ends here

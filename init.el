@@ -4,12 +4,14 @@
 (add-to-list 'package-archives
 	     '("marmalade" . "http://marmalade-repo.org/packages/"))
 (when (< emacs-major-version 24)
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-  )
-
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 (package-initialize)
 
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
     ("f5512c02e0a6887e987a816918b7a684d558716262ac7ee2dd0437ab913eaec6" default)))
@@ -19,9 +21,13 @@
  '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
  '(package-selected-packages
    (quote
-    (json-mode company-tern js2-mode org-gcal org-trello magithub magit ess php-auto-yasnippets flycheck php-extras php-eldoc ggtags zenburn-theme elpy php-refactor-mode phpcbf phpunit php-mode))))
-(custom-set-faces)
-
+    (evil json-mode company-tern js2-mode org-gcal org-trello magithub magit ess php-auto-yasnippets flycheck php-extras php-eldoc ggtags zenburn-theme elpy php-refactor-mode phpcbf phpunit php-mode))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 
 ;;; Packages:
 (add-to-list 'load-path (concat user-emacs-directory "/lisp"))

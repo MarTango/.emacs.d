@@ -13,88 +13,92 @@
 #+END_SRC
 * Org
 #+BEGIN_SRC emacs-lisp
-(use-package org
-  :ensure org-plus-contrib
-  :bind (("C-c l" . org-store-link)
-	 ("C-c a" . org-agenda)
-	 ("C-c c" . org-capture)
-	 ("C-c b" . org-iswitchb))
-  :init
-  (setq org-directory "~/orgfiles"
-	org-default-notes-file (concat org-directory "/notes.org")
-	org-capture-templates '(("t" "Task" entry (file "~/orgfiles/tasks.org")
-				 "* TODO %?\n  %i\n  %a")
-				("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-				 "* %?\n\n%^T\n\n")
-				("o" "Trello Card" entry (file "~/orgfiles/trello.org")
-				 "* To-Do %?\n %i\n %a")))
-  )
-#+END_SRC
+  (use-package org
+    :ensure org-plus-contrib
+    :bind (("C-c l" . org-store-link)
+	   ("C-c a" . org-agenda)
+	   ("C-c c" . org-capture)
+	   ("C-c b" . org-iswitchb))
+    :init
+    (setq org-directory "~/orgfiles"
+	  org-default-notes-file (concat org-directory "/notes.org")
+	  org-capture-templates '(("t" "Task" entry (file "~/orgfiles/tasks.org")
+				   "* TODO %?\n  %i\n  %a")
+				  ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
+				   "* %?\n\n%^T\n\n")
+				  ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
+				   "* To-Do %?\n %i\n %a")))
+    )
 
+  (use-package org-trello
+    :ensure t
+    :defer t
+    :config
+    (setq org-trello-current-prefix-keybinding "C-c o"))
+#+END_SRC
 * Autocompletion, Syntax Checking, Documentation
   Company, FlyCheck and ElDoc
 #+BEGIN_SRC emacs-lisp
-;; Company
-(use-package company
-  :ensure t
-  :config
-  (global-company-mode)
-  (setq company-dabbrev-downcase nil)
-  )
+  ;; Company
+  (use-package company
+    :ensure t
+    :config
+    (global-company-mode)
+    (setq company-dabbrev-downcase nil)
+    )
+  ;; Column Enforce
+  (use-package column-enforce-mode :defer t :ensure t)
 
-;; Flycheck
-(use-package flycheck
-  :defer t
-  :ensure t
-  :config
-  (global-flycheck-mode)
-  )
+  ;; Flycheck
+  (use-package flycheck
+    :defer t
+    :ensure t
+    :config
+    (global-flycheck-mode)
+    )
 
-(use-package eldoc
-  :config
-  (global-eldoc-mode))
+  (use-package eldoc
+    :config
+    (global-eldoc-mode))
 
 #+END_SRC
-
 * Git Integration
   Magit and magithub.
 #+BEGIN_SRC emacs-lisp
-(use-package magit
-  :ensure t
-  :bind (("C-x g" . magit-status)))
-(use-package magithub)
+  (use-package magit
+    :ensure t
+    :bind (("C-x g" . magit-status)))
+  (use-package magithub
+    :after magit
+    :config (magithub-feature-autoinject t))
 #+END_SRC
-
 * Coding
 ** PHP
+   php-mode, php-auto-yasnippets, php-refactor-mode are the most useful ones in this code block.
 #+BEGIN_SRC emacs-lisp
   (use-package php-auto-yasnippets
+    :defer t
     :ensure t
+    :commands php-mode
     :bind (:map php-mode-map
 		("C-c C-y" . yas/create-php-snippet))
-    ;;  :config (define-key php-mode-map (kbd "C-c C-y") 'yas/create-php-snippet)
     )
 
-  (use-package php-refactor-mode
-    :defer t)
+  (use-package php-refactor-mode :defer t)
 
-  (use-package phpcbf
-    :ensure t
+  (use-package phpcbf :ensure t :defer t
     :config
     (setq phpcbf-standard 'PSR2))
 
-  (use-package phpunit
-    :ensure t)
+  (use-package phpunit :ensure t :defer t)
 
-  (use-package phan)
+  (use-package phan :defer t)
 
-  (use-package ggtags
-    :ensure t)
+  (use-package ggtags :ensure t)
 
-  (use-package php-mode
-    :defer t
-    :ensure t
-    :mode "\\.php$"
+  (use-package php-boris :ensure t)
+
+  (use-package php-mode :defer t :ensure t :mode "\\.php$"
     :init
     (add-hook 'php-mode-hook
 	      (lambda ()
@@ -109,7 +113,7 @@
     )
 
   (use-package fluca-php
-  :load-path "site-lisp/")
+    :load-path "site-lisp/")
 #+END_SRC
 ** Javascript
    js2-mode and company-tern.
@@ -145,3 +149,10 @@
 
 
    #+END_SRC
+** Other file formats
+JSON, CSV, MD
+#+BEGIN_SRC emacs-lisp
+(use-package json-mode :ensure t)
+(use-package csv-mode :ensure t)
+(use-package markdown-mode :ensure t)
+#+END_SRC

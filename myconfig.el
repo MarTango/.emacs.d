@@ -1,8 +1,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
 (show-paren-mode)
-(global-column-enforce-mode t)
-
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
 ;; Zenburn
 (use-package zenburn-theme
   :ensure t)
@@ -24,6 +23,12 @@
 				 "* To-Do %?\n %i\n %a")))
   )
 
+(use-package org-trello
+  :ensure t
+  :defer t
+  :config
+  (setq org-trello-current-prefix-keybinding "C-c o"))
+
 ;; Company
 (use-package company
   :ensure t
@@ -31,6 +36,8 @@
   (global-company-mode)
   (setq company-dabbrev-downcase nil)
   )
+;; Column Enforce
+(use-package column-enforce-mode :defer t :ensure t)
 
 ;; Flycheck
 (use-package flycheck
@@ -47,44 +54,48 @@
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status)))
-(use-package magithub)
+(use-package magithub
+  :after magit
+  :config (magithub-feature-autoinject t))
 
 (use-package php-auto-yasnippets
+  :defer t
   :ensure t
+  :commands php-mode
   :bind (:map php-mode-map
 	      ("C-c C-y" . yas/create-php-snippet))
-  ;;  :config (define-key php-mode-map (kbd "C-c C-y") 'yas/create-php-snippet)
   )
 
-(use-package php-refactor-mode
-  :defer t)
+(use-package php-refactor-mode :defer t)
 
-(use-package phpcbf
-  :ensure t
+(use-package phpcbf :ensure t :defer t
   :config
   (setq phpcbf-standard 'PSR2))
 
-(use-package ggtags
-  :ensure t)
+(use-package phpunit :ensure t :defer t)
 
-(use-package php-mode
-  :defer t
-  :ensure t
-  :mode "\\.php$"
+(use-package phan :defer t)
+
+(use-package ggtags :ensure t)
+
+(use-package php-boris :ensure t)
+
+(use-package php-mode :defer t :ensure t :mode "\\.php$"
   :init
   (add-hook 'php-mode-hook
 	    (lambda ()
-              (php-refactor-mode)
+	      (php-refactor-mode)
 	      (ggtags-mode)
 	      (php-eldoc-enable)
-              (php-enable-psr2-coding-style)
+	      (php-enable-psr2-coding-style)
+	      (column-enforce-mode)
 	      (add-to-list 'company-backends '(company-gtags php-extras-company))
 	      )
 	    )
   )
 
 (use-package fluca-php
-:load-path "site-lisp/")
+  :load-path "site-lisp/")
 
 (use-package company-tern
   :ensure t
@@ -96,7 +107,9 @@
   :mode "\\.js\\'"
   :interpreter "node"
   :init
-  (add-hook 'js2-mode-hook (tern-mode))
+  (add-hook 'js2-mode-hook (lambda ()
+			     (tern-mode)
+			     (column-enforce-mode)))
   :config 
   (add-to-list 'company-backends 'company-tern))
 
@@ -106,3 +119,7 @@
   :interpreter "python3"
   :config
   (elpy-enable))
+
+(use-package json-mode :ensure t)
+(use-package csv-mode :ensure t)
+(use-package markdown-mode :ensure t)

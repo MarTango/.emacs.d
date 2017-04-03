@@ -16,8 +16,8 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
 
-;;; Mode-specific init files:
-(add-to-list 'load-path (concat user-emacs-directory "/lisp"))
+;;; Mode-specific init files: 
+(add-to-list 'load-path (concat user-emacs-directory "/lisp")) 
 
 ;; Zenburn
 (use-package zenburn-theme
@@ -40,44 +40,36 @@
   (global-flycheck-mode)
   )
 
-
 ;; Magit
 (use-package magit
+  :ensure t
   :bind (("C-x g" . magit-status)))
+(use-package magithub)
 
+(use-package eldoc
+  :config
+  (global-eldoc-mode))
 
 ;; General
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
-(global-eldoc-mode)
+;; (global-eldoc-mode)
 (show-paren-mode)
 (setq inhibit-startup-screen t)
 (global-column-enforce-mode t)
 
-;; JavaScript
 (require 'init-js2)
-
-;; Magit
-(global-set-key (kbd "C-x g") 'magit-status)
-(require 'magithub)
-
-;; mu4e
 (require 'init-mu4e)
-
-;; Org
 (require 'init-orgmode)
-
-;; Org-gcal
 (require 'init-orggcal)
-
-;; PHP
 (require 'init-php)
 
 ;; Python
-(setq elpy-rpc-python-command "python3")
-(elpy-enable)
-
-;; Theme
-(load-theme 'zenburn)
+(use-package elpy
+  :defer t
+  :ensure t
+  :interpreter "python3"
+  :config
+  (elpy-enable))
 
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)

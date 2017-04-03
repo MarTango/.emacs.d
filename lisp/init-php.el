@@ -12,7 +12,7 @@
 	    (php-eldoc-enable)
 	    (setq show-trailing-whitespace nil)))
 (setq phpcbf-standard 'PSR2)
-(add-to-list 'company-backends 'company-gtags)
+(add-to-list 'company-backends '(company-gtags php-extras-company))
 
 (require 'fluca-php)
 (provide 'init-php)

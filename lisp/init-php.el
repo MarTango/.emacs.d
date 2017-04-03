@@ -12,8 +12,10 @@
 	    (php-eldoc-enable)
 	    (setq show-trailing-whitespace nil)))
 (setq phpcbf-standard 'PSR2)
-(provide 'init-php)
+(add-to-list 'company-backends 'company-gtags)
 
+(require 'fluca-php)
+(provide 'init-php)
 ;;; Commentary:
 
 ;; Local Variables:

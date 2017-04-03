@@ -1,47 +1,57 @@
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives
-	     '("marmalade" . "http://marmalade-repo.org/packages/"))
-(when (< emacs-major-version 24)
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(setq package-enable-at-startup nil)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			 ("marmalade" . "http://marmalade-repo.org/packages/")
+			 ("gnu" . "http://elpa.gnu.org/packages/")))
 (package-initialize)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("f5512c02e0a6887e987a816918b7a684d558716262ac7ee2dd0437ab913eaec6" default)))
- '(org-agenda-files
-   (quote
-    ("~/orgfiles/gcal.org" "~/Expedia/summary.org" "~/orgfiles/trello.org" "~/orgfiles/tasks.org")))
- '(org-trello-current-prefix-keybinding "C-c o" nil (org-trello))
- '(package-selected-packages
-   (quote
-    (evil json-mode company-tern js2-mode org-gcal org-trello magithub magit ess php-auto-yasnippets flycheck php-extras php-eldoc ggtags zenburn-theme elpy php-refactor-mode phpcbf phpunit php-mode))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(eval-when-compile
+  (require 'use-package))
+(require 'diminish)
+(require 'bind-key)
 
-;;; Packages:
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
+
+;;; Mode-specific init files:
 (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
 
+;; Zenburn
+(use-package zenburn-theme
+  :ensure t)
+
 ;; Company
-(global-company-mode)
+(use-package company
+  :defer t
+  :ensure t
+  :config
+  (global-company-mode)
+  (setq company-dabbrev-downcase nil)
+  )
 
 ;; Flycheck
-(global-flycheck-mode)
+(use-package flycheck
+  :defer t
+  :ensure t
+  :config
+  (global-flycheck-mode)
+  )
+
+
+;; Magit
+(use-package magit
+  :bind (("C-x g" . magit-status)))
+
 
 ;; General
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
-(ivy-mode)
 (global-eldoc-mode)
+(show-paren-mode)
+(setq inhibit-startup-screen t)
+(global-column-enforce-mode t)
 
 ;; JavaScript
 (require 'init-js2)
@@ -63,6 +73,7 @@
 (require 'init-php)
 
 ;; Python
+(setq elpy-rpc-python-command "python3")
 (elpy-enable)
 
 ;; Theme

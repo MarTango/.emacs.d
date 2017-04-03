@@ -6,7 +6,7 @@
   (fset 'yes-or-no-p 'y-or-n-p)
   (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
   (show-paren-mode)
-
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
   ;; Zenburn
   (use-package zenburn-theme
     :ensure t)

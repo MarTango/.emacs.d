@@ -33,6 +33,8 @@
   (use-package org-trello
     :ensure t
     :defer t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.trello$" . org-mode))
     :config
     (setq org-trello-current-prefix-keybinding "C-c o"))
 #+END_SRC
@@ -51,9 +53,8 @@
 
   ;; Flycheck
   (use-package flycheck
-    :defer t
     :ensure t
-    :config
+    :init
     (global-flycheck-mode)
     )
 
@@ -79,14 +80,14 @@
   (use-package php-auto-yasnippets
     :defer t
     :ensure t
-    :commands php-mode
+    :after php-mode
     :bind (:map php-mode-map
 		("C-c C-y" . yas/create-php-snippet))
     )
 
   (use-package php-refactor-mode :defer t)
 
-  (use-package phpcbf :ensure t :defer t
+  (use-package phpcbf :ensure t
     :config
     (setq phpcbf-standard 'PSR2))
 
@@ -107,7 +108,8 @@
 		(php-eldoc-enable)
 		(php-enable-psr2-coding-style)
 		(column-enforce-mode)
-		(add-to-list 'company-backends '(company-gtags php-extras-company))
+		(setq company-dabbrev-downcase nil)
+		(add-to-list 'company-backends '(company-gtags php-extras-company company-keywords company-abbrev company-files))
 		)
 	      )
     )
@@ -120,6 +122,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package company-tern
     :ensure t
+    :defer t
     )
 
   (use-package js2-mode
@@ -131,12 +134,10 @@
     (add-hook 'js2-mode-hook (lambda ()
 			       (tern-mode)
 			       (column-enforce-mode)))
-    :config 
+    :config
+    (setq js2-basic-offset 2)
     (add-to-list 'company-backends 'company-tern))
 #+END_SRC
-
-#+RESULTS:
-
 ** Python
    Elpy is good to me.
    #+BEGIN_SRC emacs-lisp

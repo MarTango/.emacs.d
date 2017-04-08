@@ -22,7 +22,6 @@
 (setq inhibit-startup-screen t)
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file)
-
 ;; Where to look for custom lisp scripts.
 (add-to-list 'load-path (concat user-emacs-directory "lisp/"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp/"))

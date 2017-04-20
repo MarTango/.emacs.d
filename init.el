@@ -21,6 +21,7 @@
 ;; General
 (setq inhibit-startup-screen t)
 (setq custom-file (concat user-emacs-directory "custom.el"))
+(setq-default indent-tabs-mode nil)
 (load custom-file)
 ;; Where to look for custom lisp scripts.
 (add-to-list 'load-path (concat user-emacs-directory "lisp/"))

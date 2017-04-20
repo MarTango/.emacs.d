@@ -10,6 +10,9 @@
   ;; Zenburn
   (use-package zenburn-theme
     :ensure t)
+  (use-package undo-tree
+    :ensure t
+    :init (global-undo-tree-mode t))
 #+END_SRC
 * Org
 #+BEGIN_SRC emacs-lisp
@@ -37,31 +40,6 @@
     (add-to-list 'auto-mode-alist '("\\.trello$" . org-mode))
     :config
     (setq org-trello-current-prefix-keybinding "C-c o"))
-#+END_SRC
-* Autocompletion, Syntax Checking, Documentation
-  Company, FlyCheck and ElDoc
-#+BEGIN_SRC emacs-lisp
-  ;; Company
-  (use-package company
-    :ensure t
-    :config
-    (global-company-mode)
-    (setq company-dabbrev-downcase nil)
-    )
-  ;; Column Enforce
-  (use-package column-enforce-mode :defer t :ensure t)
-
-  ;; Flycheck
-  (use-package flycheck
-    :ensure t
-    :init
-    (global-flycheck-mode)
-    )
-
-  (use-package eldoc
-    :config
-    (global-eldoc-mode))
-
 #+END_SRC
 * Git Integration
   Magit and magithub.
@@ -120,10 +98,7 @@
 ** Javascript
    js2-mode and company-tern.
 #+BEGIN_SRC emacs-lisp
-  (use-package company-tern
-    :ensure t
-    :defer t
-    )
+  (use-package company-tern :ensure t :defer t)
 
   (use-package js2-mode
     :ensure t
@@ -137,6 +112,18 @@
     :config
     (setq js2-basic-offset 2)
     (add-to-list 'company-backends 'company-tern))
+
+
+  (use-package js-comint
+    :ensure t
+    :defer t
+    :after js2-mode
+    :bind (:map js2-mode-map
+                ("C-x C-e" . js-send-last-sexp)
+                ("C-M-x" . js-send-last-sexp-and-go)
+                ("C-c C-b" . js-send-buffer-and-go)
+                ("C-c l" . js-load-file-and-go)))
+
 #+END_SRC
 ** Python
    Elpy is good to me.
@@ -144,11 +131,10 @@
      (use-package elpy
        :defer t
        :ensure t
-       :interpreter "python3"
-       :config
-       (elpy-enable))
-
-
+       :init
+       (elpy-enable)
+       (setq elpy-rpc-python-command "python3")
+       (setq python-shell-interpreter "python3"))
    #+END_SRC
 ** Other file formats
 JSON, CSV, MD
@@ -156,4 +142,30 @@ JSON, CSV, MD
 (use-package json-mode :ensure t :defer t)
 (use-package csv-mode :ensure t :defer t)
 (use-package markdown-mode :ensure t :defer t )
+#+END_SRC
+* Autocompletion, Syntax Checking, Documentation
+  Company, FlyCheck, ElDoc, Ivy Mode
+#+BEGIN_SRC emacs-lisp
+  ;; Company
+  (use-package company
+    :ensure t
+    :config
+    (global-company-mode)
+    (setq company-dabbrev-downcase nil)
+    )
+  ;; Column Enforce
+  (use-package column-enforce-mode :defer t :ensure t)
+
+  ;; Flycheck
+  (use-package flycheck
+    :ensure t
+    :init
+    (global-flycheck-mode)
+    :config
+    (setq sentence-end-double-space nil)
+    )
+
+  (use-package eldoc
+    :config
+    (global-eldoc-mode))
 #+END_SRC

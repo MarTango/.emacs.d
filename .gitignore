@@ -8,3 +8,5 @@ abbrev_defs
 network-security.data
 bookmarks
 /.trello
+/tramp
+custom.el

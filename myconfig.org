@@ -1,8 +1,10 @@
 #+TITLE: emacs config
 #+AUTHOR: Martin
 
-* General Keybinds and Preferences
+* Preferences
 #+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-screen t)
+  (setq-default indent-tabs-mode nil)
   (fset 'yes-or-no-p 'y-or-n-p)
   (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
   (show-paren-mode)
@@ -163,6 +165,7 @@ JSON, CSV, MD
     (global-flycheck-mode)
     :config
     (setq sentence-end-double-space nil)
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
     )
 
   (use-package eldoc

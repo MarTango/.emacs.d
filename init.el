@@ -18,12 +18,11 @@
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;;
 
-;; General
-(setq inhibit-startup-screen t)
+;; Custom file
 (setq custom-file (concat user-emacs-directory "custom.el"))
-(setq-default indent-tabs-mode nil)
 (load custom-file)
-;; Where to look for custom lisp scripts.
+
+;; My and third party emacs-lisp scripts.
 (add-to-list 'load-path (concat user-emacs-directory "lisp/"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp/"))
 
@@ -35,8 +34,3 @@
 
 ;; Org/Google-Calendar integration.
 (require 'init-orggcal)
-
-;; Local Variables:
-;; byte-compile-warnings: (not free-vars)
-;; End:
-;;; init.el ends here

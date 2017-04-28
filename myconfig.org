@@ -1,21 +1,89 @@
 #+TITLE: emacs config
 #+AUTHOR: Martin
 
-* Preferences  
-#+BEGIN_SRC emacs-lisp
-  (setq custom-file (concat user-emacs-directory "custom.el"))
-  (load custom-file)
-  (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
-  (setq inhibit-startup-screen t)
-  (setq-default indent-tabs-mode nil)
-  (fset 'yes-or-no-p 'y-or-n-p)
-  (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
-  (show-paren-mode)
-  (use-package challenger-deep-theme :ensure t)
-  (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
-#+END_SRC
+* Coding
+** PHP
+   php-mode is the major mode for editing PHP files.
+   #+BEGIN_SRC emacs-lisp
+   (use-package php-mode :defer t :ensure t :mode "\\.php$"
+     :config
+     (add-to-list 'company-backends '(company-gtags php-extras-company company-keywords company-abbrev company-files))
+     (setq php-mode-coding-style 'psr2)
+     (php-eldoc-enable))   
+   #+END_SRC
+
+   Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
+   #+BEGIN_SRC emacs-lisp
+   (use-package php-extras :defer t :ensure t :after php-mode)   
+   (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
+     :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
+   (use-package php-eldoc :defer t :ensure t :after php-mode)
+   (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
+   #+END_SRC
+
+   Refactoring tool php-refactor-mode
+   #+BEGIN_SRC emacs-lisp
+   (use-package php-refactor-mode :defer t :init (add-hook 'php-mode-hook #'php-refactor-mode))   
+   #+END_SRC
+
+   PHPUnit for tests, boris for repl, phpcbf for autoformatting.
+   #+BEGIN_SRC emacs-lisp
+   (use-package phpunit :ensure t :defer t)
+   (use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard 'PSR2))
+   (use-package php-boris :defer t)
+   (use-package phan :defer t)
+   (use-package fluca-php :load-path "site-lisp/")
+   #+END_SRC
+** Javascript
+   js2-mode, js-comint and tern.
+   #+BEGIN_SRC emacs-lisp
+  (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
+  (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
+  (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+  (use-package js-comint :ensure t :defer t :after js2-mode
+    :bind (:map js2-mode-map
+                ("C-x C-e" . js-send-last-sexp)
+                ("C-M-x" . js-send-last-sexp-and-go)
+                ("C-c C-b" . js-send-buffer-and-go)
+                ("C-c l" . js-load-file-and-go)))
+   #+END_SRC
+** Python
+   Elpy is good to me.
+   #+BEGIN_SRC emacs-lisp
+     (use-package elpy :defer t :ensure t
+       :init
+       (elpy-enable)
+       (setq elpy-rpc-python-command "python3")
+       (setq python-shell-interpreter "python3"))
+   #+END_SRC
+* Useful Packages
+  Company for autocompletion.
+  #+BEGIN_SRC emacs-lisp
+    (use-package company :ensure t 
+      :config
+      (global-company-mode)
+      (setq company-dabbrev-downcase nil))
+  #+END_SRC
+
+  Flycheck for syntax checking.
+  #+BEGIN_SRC emacs-lisp
+    (use-package flycheck :ensure t
+      :init (global-flycheck-mode)
+      :config
+      (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+  #+END_SRC
+
+  Some other useful packages..
+  #+BEGIN_SRC emacs-lisp
+    (use-package column-enforce-mode :defer t :ensure t :after (php-mode js2-mode))
+    (use-package eldoc :config (global-eldoc-mode))
+    (use-package json-mode :ensure t :defer t)
+    (use-package csv-mode :ensure t :defer t)
+    (use-package markdown-mode :ensure t :defer t )
+  #+END_SRC
 * Org
-#+BEGIN_SRC emacs-lisp
+  Org mode is wonderful. Org trello is helpful.
+  #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure org-plus-contrib
     :bind (("C-c l" . org-store-link)
@@ -33,72 +101,36 @@
   (use-package org-trello :ensure t :defer t
     :init (add-to-list 'auto-mode-alist '("\\.trello$" . org-mode))
     :config (setq org-trello-current-prefix-keybinding "C-c o"))
-#+END_SRC
+  #+END_SRC
 * Git Integration
-  Magit and magithub.
-#+BEGIN_SRC emacs-lisp
+  Magit and magithub are must haves.
+  #+BEGIN_SRC emacs-lisp
   (use-package magit :ensure t :bind (("C-x g" . magit-status)))
   (use-package magithub :after magit :config (magithub-feature-autoinject t))
-#+END_SRC
-* Coding
-** PHP
-   php-mode, php-auto-yasnippets, php-refactor-mode are the most useful ones in this code block.
-#+BEGIN_SRC emacs-lisp
-   (use-package php-mode :defer t :ensure t :mode "\\.php$"
-     :config
-     (add-to-list 'company-backends '(company-gtags php-extras-company company-keywords company-abbrev company-files))
-     (setq php-mode-coding-style 'psr2)
-     (php-eldoc-enable))
-   (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
-     :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
-   (use-package php-refactor-mode :defer t :init (add-hook 'php-mode-hook #'php-refactor-mode))
-   (use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard 'PSR2))
-   (use-package phpunit :ensure t :defer t)
-   (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
-   (use-package php-boris :defer t)
-   (use-package phan :defer t)
-   (use-package fluca-php :load-path "site-lisp/")
-#+END_SRC
-** Javascript
-   js2-mode, js-comint and tern.
-#+BEGIN_SRC emacs-lisp
-  (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
-  (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
-  (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
-  (use-package js-comint :ensure t :defer t :after js2-mode
-    :bind (:map js2-mode-map
-                ("C-x C-e" . js-send-last-sexp)
-                ("C-M-x" . js-send-last-sexp-and-go)
-                ("C-c C-b" . js-send-buffer-and-go)
-                ("C-c l" . js-load-file-and-go)))
-#+END_SRC
-** Python
-   Elpy is good to me.
-   #+BEGIN_SRC emacs-lisp
-     (use-package elpy :defer t :ensure t
-       :init
-       (elpy-enable)
-       (setq elpy-rpc-python-command "python3")
-       (setq python-shell-interpreter "python3"))
-   #+END_SRC
-* Useful Packages
-#+BEGIN_SRC emacs-lisp
-  ;; Company
-  (use-package company :ensure t
-    :config
-    (global-company-mode)
-    (setq company-dabbrev-downcase nil))
-  ;; Flycheck
-  (use-package flycheck
-    :ensure t
-    :init
-    (global-flycheck-mode)
-    :config
-    (setq sentence-end-double-space nil)
-    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-  (use-package column-enforce-mode :defer t :ensure t :after php-mode)
-  (use-package eldoc :config (global-eldoc-mode))
-  (use-package json-mode :ensure t :defer t)
-  (use-package csv-mode :ensure t :defer t)
-  (use-package markdown-mode :ensure t :defer t )
-#+END_SRC
+  #+END_SRC
+* Preferences
+  I use a =custom.el= file to keep =init.el= clean.
+  #+BEGIN_SRC emacs-lisp
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file)
+  #+END_SRC
+  I use a backup directory to keep =~= files from cluttering the directories.
+  #+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
+  #+END_SRC
+  Some preferences include no startup screen, spaces instead of tabs, using y and n to answer yes/no prompts, and showing matching parentheses.
+  #+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-screen t)
+  (setq-default indent-tabs-mode nil)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
+  (show-paren-mode)  
+  #+END_SRC
+  Current theme is Challenger Deep.
+  #+BEGIN_SRC emacs-lisp
+  (use-package challenger-deep-theme :ensure t)
+  #+END_SRC
+  Undo Tree is pretty cool.
+  #+BEGIN_SRC emacs-lisp
+  (use-package undo-tree :ensure t :init (global-undo-tree-mode t))  
+  #+END_SRC

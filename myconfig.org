@@ -3,14 +3,16 @@
 
 * Preferences
 #+BEGIN_SRC emacs-lisp
+  (setq custom-file (concat user-emacs-directory "custom.el"))
+  (load custom-file)
   (setq inhibit-startup-screen t)
   (setq-default indent-tabs-mode nil)
   (fset 'yes-or-no-p 'y-or-n-p)
   (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
   (show-paren-mode)
   (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
-  ;; Zenburn
-  (use-package zenburn-theme
+  ;; Color Theme
+  (use-package challenger-deep-theme
     :ensure t)
   (use-package undo-tree
     :ensure t
@@ -57,51 +59,32 @@
 ** PHP
    php-mode, php-auto-yasnippets, php-refactor-mode are the most useful ones in this code block.
 #+BEGIN_SRC emacs-lisp
-  (use-package php-auto-yasnippets
-    :defer t
-    :ensure t
-    :after php-mode
-    :bind (:map php-mode-map
-		("C-c C-y" . yas/create-php-snippet))
-    )
-
+  (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
+  :bind (:map php-mode-map
+	        ("C-c C-y" . yas/create-php-snippet)))
   (use-package php-refactor-mode :defer t)
-
-  (use-package phpcbf :ensure t
-    :config
-    (setq phpcbf-standard 'PSR2))
-
+  (use-package phpcbf :ensure t :config (setq phpcbf-standard 'PSR2))
   (use-package phpunit :ensure t :defer t)
-
   (use-package phan :defer t)
-
   (use-package ggtags :ensure t)
-
   (use-package php-boris :ensure t)
-
   (use-package php-mode :defer t :ensure t :mode "\\.php$"
     :init
     (add-hook 'php-mode-hook
 	      (lambda ()
-		(php-refactor-mode)
-		(ggtags-mode)
-		(php-eldoc-enable)
-		(php-enable-psr2-coding-style)
-		(column-enforce-mode)
-		(setq company-dabbrev-downcase nil)
-		(add-to-list 'company-backends '(company-gtags php-extras-company company-keywords company-abbrev company-files))
-		)
-	      )
-    )
-
-  (use-package fluca-php
-    :load-path "site-lisp/")
+	        (php-refactor-mode)
+	        (ggtags-mode)
+	        (php-eldoc-enable)
+	        (php-enable-psr2-coding-style)
+	        (column-enforce-mode)
+	        (setq company-dabbrev-downcase nil)
+	        (add-to-list 'company-backends '(company-gtags php-extras-company company-keywords company-abbrev company-files)))))
+  (use-package fluca-php :load-path "site-lisp/")
 #+END_SRC
 ** Javascript
    js2-mode and company-tern.
 #+BEGIN_SRC emacs-lisp
   (use-package company-tern :ensure t :defer t)
-
   (use-package js2-mode
     :ensure t
     :defer t
@@ -114,8 +97,6 @@
     :config
     (setq js2-basic-offset 2)
     (add-to-list 'company-backends 'company-tern))
-
-
   (use-package js-comint
     :ensure t
     :defer t
@@ -138,25 +119,13 @@
        (setq elpy-rpc-python-command "python3")
        (setq python-shell-interpreter "python3"))
    #+END_SRC
-** Other file formats
-JSON, CSV, MD
-#+BEGIN_SRC emacs-lisp
-(use-package json-mode :ensure t :defer t)
-(use-package csv-mode :ensure t :defer t)
-(use-package markdown-mode :ensure t :defer t )
-#+END_SRC
-* Autocompletion, Syntax Checking, Documentation
-  Company, FlyCheck, ElDoc, Ivy Mode
+* Useful Packages
 #+BEGIN_SRC emacs-lisp
   ;; Company
-  (use-package company
-    :ensure t
+  (use-package company :ensure t
     :config
     (global-company-mode)
-    (setq company-dabbrev-downcase nil)
-    )
-  ;; Column Enforce
-  (use-package column-enforce-mode :defer t :ensure t)
+    (setq company-dabbrev-downcase nil))
 
   ;; Flycheck
   (use-package flycheck
@@ -165,10 +134,11 @@ JSON, CSV, MD
     (global-flycheck-mode)
     :config
     (setq sentence-end-double-space nil)
-    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
-    )
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
-  (use-package eldoc
-    :config
-    (global-eldoc-mode))
+  (use-package column-enforce-mode :defer t :ensure t)
+  (use-package eldoc :config (global-eldoc-mode))
+  (use-package json-mode :ensure t :defer t)
+  (use-package csv-mode :ensure t :defer t)
+  (use-package markdown-mode :ensure t :defer t )
 #+END_SRC

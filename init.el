@@ -15,19 +15,13 @@
 (require 'diminish)
 (require 'bind-key)
 
-
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;;
-
-;; Custom file
-(setq custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file)
-
-;; My and third party emacs-lisp scripts.
-(add-to-list 'load-path (concat user-emacs-directory "lisp/"))
-(add-to-list 'load-path (concat user-emacs-directory "site-lisp/"))
 
 ;; Org Init File. Everything is in here!
 (org-babel-load-file (concat user-emacs-directory "myconfig.org"))
+
+;; My emacs-lisp scripts.
+(add-to-list 'load-path (concat user-emacs-directory "lisp/"))
 
 ;; Email
 (require 'init-mu4e)

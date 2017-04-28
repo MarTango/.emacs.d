@@ -11,12 +11,8 @@
   (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
   (show-paren-mode)
   (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
-  ;; Color Theme
-  (use-package challenger-deep-theme
-    :ensure t)
-  (use-package undo-tree
-    :ensure t
-    :init (global-undo-tree-mode t))
+  (use-package challenger-deep-theme :ensure t)
+  (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 #+END_SRC
 * Org
 #+BEGIN_SRC emacs-lisp
@@ -26,34 +22,23 @@
 	   ("C-c a" . org-agenda)
 	   ("C-c c" . org-capture)
 	   ("C-c b" . org-iswitchb))
-    :init
-    (setq org-directory "~/orgfiles"
-	  org-default-notes-file (concat org-directory "/notes.org")
-	  org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
-				   "* TODO %?\n  %i\n  %a")
-				  ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-				   "* %?\n\n%^T\n\n")
-				  ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
-				   "* To-Do %?\n %i\n %a")))
-    )
-
-  (use-package org-trello
-    :ensure t
-    :defer t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.trello$" . org-mode))
-    :config
-    (setq org-trello-current-prefix-keybinding "C-c o"))
+    :init (setq org-directory "~/orgfiles"
+                org-default-notes-file (concat org-directory "/notes.org")
+                org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
+                                         "* TODO %?\n  %i\n  %a")
+                                        ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
+                                         "* %?\n\n%^T\n\n")
+                                        ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
+                                         "* To-Do %?\n %i\n %a"))))
+  (use-package org-trello :ensure t :defer t
+    :init (add-to-list 'auto-mode-alist '("\\.trello$" . org-mode))
+    :config (setq org-trello-current-prefix-keybinding "C-c o"))
 #+END_SRC
 * Git Integration
   Magit and magithub.
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :ensure t
-    :bind (("C-x g" . magit-status)))
-  (use-package magithub
-    :after magit
-    :config (magithub-feature-autoinject t))
+  (use-package magit :ensure t :bind (("C-x g" . magit-status)))
+  (use-package magithub :after magit :config (magithub-feature-autoinject t))
 #+END_SRC
 * Coding
 ** PHP
@@ -126,7 +111,6 @@
     :config
     (global-company-mode)
     (setq company-dabbrev-downcase nil))
-
   ;; Flycheck
   (use-package flycheck
     :ensure t
@@ -135,7 +119,6 @@
     :config
     (setq sentence-end-double-space nil)
     (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
   (use-package column-enforce-mode :defer t :ensure t)
   (use-package eldoc :config (global-eldoc-mode))
   (use-package json-mode :ensure t :defer t)

@@ -1,16 +1,16 @@
 #+TITLE: emacs config
 #+AUTHOR: Martin
 
-* Preferences
+* Preferences  
 #+BEGIN_SRC emacs-lisp
   (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file)
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
   (setq inhibit-startup-screen t)
   (setq-default indent-tabs-mode nil)
   (fset 'yes-or-no-p 'y-or-n-p)
   (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
   (show-paren-mode)
-  (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
   (use-package challenger-deep-theme :ensure t)
   (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 #+END_SRC
@@ -60,38 +60,22 @@
    (use-package fluca-php :load-path "site-lisp/")
 #+END_SRC
 ** Javascript
-   js2-mode and company-tern.
+   js2-mode, js-comint and tern.
 #+BEGIN_SRC emacs-lisp
-  (use-package company-tern :ensure t :defer t)
-  (use-package js2-mode
-    :ensure t
-    :defer t
-    :mode "\\.js\\'"
-    :interpreter "node"
-    :init
-    (add-hook 'js2-mode-hook (lambda ()
-			       (tern-mode)
-			       (column-enforce-mode)))
-    :config
-    (setq js2-basic-offset 2)
-    (add-to-list 'company-backends 'company-tern))
-  (use-package js-comint
-    :ensure t
-    :defer t
-    :after js2-mode
+  (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
+  (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
+  (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+  (use-package js-comint :ensure t :defer t :after js2-mode
     :bind (:map js2-mode-map
                 ("C-x C-e" . js-send-last-sexp)
                 ("C-M-x" . js-send-last-sexp-and-go)
                 ("C-c C-b" . js-send-buffer-and-go)
                 ("C-c l" . js-load-file-and-go)))
-
 #+END_SRC
 ** Python
    Elpy is good to me.
    #+BEGIN_SRC emacs-lisp
-     (use-package elpy
-       :defer t
-       :ensure t
+     (use-package elpy :defer t :ensure t
        :init
        (elpy-enable)
        (setq elpy-rpc-python-command "python3")

@@ -27,7 +27,7 @@
     :init
     (setq org-directory "~/orgfiles"
 	  org-default-notes-file (concat org-directory "/notes.org")
-	  org-capture-templates '(("t" "Task" entry (file "~/orgfiles/tasks.org")
+	  org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
 				   "* TODO %?\n  %i\n  %a")
 				  ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
 				   "* %?\n\n%^T\n\n")

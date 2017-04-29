@@ -47,6 +47,10 @@
                 ("C-c C-b" . js-send-buffer-and-go)
                 ("C-c l" . js-load-file-and-go)))
    #+END_SRC
+   js2-refactor
+   #+BEGIN_SRC emacs-lisp
+   (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode))
+   #+END_SRC
 ** Python
    Elpy is good to me.
    #+BEGIN_SRC emacs-lisp
@@ -132,5 +136,5 @@
   #+END_SRC
   Undo Tree is pretty cool.
   #+BEGIN_SRC emacs-lisp
-  (use-package undo-tree :ensure t :init (global-undo-tree-mode t))  
+  (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
   #+END_SRC

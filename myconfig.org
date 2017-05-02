@@ -88,29 +88,27 @@
 * Org
   Org mode is wonderful. Org trello is helpful.
   #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure org-plus-contrib
-    :bind (("C-c l" . org-store-link)
-	   ("C-c a" . org-agenda)
-	   ("C-c c" . org-capture)
-	   ("C-c b" . org-iswitchb))
-    :init (setq org-directory "~/orgfiles"
-                org-default-notes-file (concat org-directory "/notes.org")
-                org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
-                                         "* TODO %?\n  %i\n  %a")
-                                        ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-                                         "* %?\n\n%^T\n\n")
-                                        ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
-                                         "* To-Do %?\n %i\n %a"))))
-  (use-package org-trello :ensure t :defer t
-    :init (add-to-list 'auto-mode-alist '("\\.trello$" . org-mode))
-    :config (setq org-trello-current-prefix-keybinding "C-c o"))
+    (use-package org
+      :ensure org-plus-contrib
+      :bind (("C-c l" . org-store-link)
+           ("C-c a" . org-agenda)
+           ("C-c c" . org-capture)
+           ("C-c b" . org-iswitchb))
+      :init (setq org-directory "~/orgfiles"
+                  org-default-notes-file (concat org-directory "/notes.org")
+                  org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
+                                           "* TODO %?\n  %i\n  %a")
+                                          ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
+                                           "* %?\n\n%^T\n\n")
+                                          ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
+                                           "* To-Do %?\n %i\n %a"))))
+    (use-package org-trello :ensure t :defer t :config (setq org-trello-current-prefix-keybinding "C-c o"))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.
   #+BEGIN_SRC emacs-lisp
-  (use-package magit :ensure t :bind (("C-x g" . magit-status)))
-  (use-package magithub :after magit :config (magithub-feature-autoinject t))
+  (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
+  (use-package magithub :ensure t :defer t :after magit :config (magithub-feature-autoinject t))
   #+END_SRC
 * Preferences
   I use a =custom.el= file to keep =init.el= clean.

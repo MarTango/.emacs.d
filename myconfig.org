@@ -2,6 +2,18 @@
 #+AUTHOR: Martin
 
 * Coding
+** HTML
+   #+BEGIN_SRC emacs-lisp
+     (use-package web-mode :ensure t :defer t
+       :config (setq web-mode-code-indent-offset 2) (setq web-mode-markup-indent-offset 2)
+       :mode "\\.html?\\'")
+     (use-package emmet-mode :ensure t
+       :init (add-hook 'multi-web-mode-hook #'emmet-mode)
+       :config
+       (add-hook 'sgml-mode-hook #'emmet-mode)
+       (add-hook 'css-mode-hook #'emmet-mode)
+       )
+   #+END_SRC
 ** PHP
    php-mode is the major mode for editing PHP files.
    #+BEGIN_SRC emacs-lisp
@@ -15,8 +27,8 @@
    Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
    #+BEGIN_SRC emacs-lisp
    (use-package php-extras :defer t :ensure t :after php-mode)   
-   (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
-     :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
+   (use-package php-auto-yasnippets :disabled :defer t :ensure t :after php-mode
+    bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
    (use-package php-eldoc :defer t :ensure t :after php-mode)
    (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
    #+END_SRC
@@ -37,7 +49,7 @@
 ** Javascript
    js2-mode, js-comint and tern.
    #+BEGIN_SRC emacs-lisp
-  (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
+  (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode) (add-hook 'web-mode-hook #'tern-mode))
   (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
   (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
   (use-package js-comint :ensure t :defer t :after js2-mode
@@ -79,7 +91,6 @@
 
   Some other useful packages..
   #+BEGIN_SRC emacs-lisp
-    (use-package column-enforce-mode :defer t :ensure t :after (php-mode js2-mode))
     (use-package eldoc :config (global-eldoc-mode))
     (use-package json-mode :ensure t :defer t)
     (use-package csv-mode :ensure t :defer t)

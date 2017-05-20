@@ -8,7 +8,7 @@
        :config (setq web-mode-code-indent-offset 2) (setq web-mode-markup-indent-offset 2)
        :mode "\\.html?\\'")
      (use-package emmet-mode :ensure t
-       :init (add-hook 'multi-web-mode-hook #'emmet-mode)
+       :init (add-hook 'web-mode-hook #'emmet-mode)
        :config
        (add-hook 'sgml-mode-hook #'emmet-mode)
        (add-hook 'css-mode-hook #'emmet-mode)
@@ -49,38 +49,41 @@
 ** Javascript
    js2-mode, js-comint and tern.
    #+BEGIN_SRC emacs-lisp
-  (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode) (add-hook 'web-mode-hook #'tern-mode))
-  (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
-  (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
-  (use-package js-comint :ensure t :defer t :after js2-mode
-    :bind (:map js2-mode-map
-                ("C-x C-e" . js-send-last-sexp)
-                ("C-M-x" . js-send-last-sexp-and-go)
-                ("C-c C-b" . js-send-buffer-and-go)
-                ("C-c l" . js-load-file-and-go)))
-   #+END_SRC
-   js2-refactor
-   #+BEGIN_SRC emacs-lisp
-   (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode))
+     (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode) (add-hook 'web-mode-hook #'tern-mode))
+     (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
+     (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+     (use-package js-comint :disabled :ensure t :defer t :after js2-mode
+       :bind (:map js2-mode-map
+                   ("C-x C-e" . js-send-last-sexp)
+                   ("C-M-x" . js-send-last-sexp-and-go)
+                   ("C-c C-b" . js-send-buffer-and-go)
+                   ("C-c l" . js-load-file-and-go)))
+     (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode))
    #+END_SRC
 ** Python
    Elpy is good to me.
    #+BEGIN_SRC emacs-lisp
-     (use-package elpy :defer t :ensure t
+     (use-package elpy :disabled :defer t :ensure t
        :init
        (elpy-enable)
        (setq elpy-rpc-python-command "python3")
        (setq python-shell-interpreter "python3"))
    #+END_SRC
 * Useful Packages
-  Company for autocompletion.
+  Autocompletion.
   #+BEGIN_SRC emacs-lisp
     (use-package company :ensure t 
       :config
       (global-company-mode)
       (setq company-dabbrev-downcase nil))
+    (use-package helm :ensure t :defer t
+      :init
+      (helm-mode 1)
+      (global-set-key (kbd "M-x") #'helm-M-x)
+      (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+      (global-set-key (kbd "C-x C-f") #'helm-find-files))
+    (use-package helm-ls-git :ensure t :defer t)
   #+END_SRC
-
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck :ensure t
@@ -88,13 +91,13 @@
       :config
       (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
   #+END_SRC
-
   Some other useful packages..
   #+BEGIN_SRC emacs-lisp
     (use-package eldoc :config (global-eldoc-mode))
     (use-package json-mode :ensure t :defer t)
     (use-package csv-mode :ensure t :defer t)
     (use-package markdown-mode :ensure t :defer t )
+    (use-package projectile :ensure t :defer t :init (projectile-mode) :commands (projectile-mode))
   #+END_SRC
 * Org
   Org mode is wonderful. Org trello is helpful.

@@ -18,8 +18,9 @@
    php-mode is the major mode for editing PHP files.
    #+BEGIN_SRC emacs-lisp
    (use-package php-mode :defer t :ensure t :mode "\\.php$"
+     :init
+     (add-hook 'php-mode-hook (lambda() (add-to-list 'company-backends '(company-gtags php-extras-company))))
      :config
-     (add-to-list 'company-backends '(company-gtags php-extras-company company-keywords company-abbrev company-files))
      (setq php-mode-coding-style 'psr2)
      (php-eldoc-enable))   
    #+END_SRC
@@ -83,7 +84,9 @@
       (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
       (global-set-key (kbd "C-x C-f") #'helm-find-files)
       (global-set-key (kbd "C-x C-d") #'helm-browse-project))
-     (use-package helm-ls-git :ensure t :defer t)
+    (use-package helm-ls-git :ensure t :defer t)
+    (use-package which-key :ensure t :init (which-key-mode 1))
+    (use-package helm-projectile :ensure t :init (projectile-mode) (setq projectile-completion-system 'helm) (helm-projectile-on))
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp
@@ -98,7 +101,6 @@
     (use-package json-mode :ensure t :defer t)
     (use-package csv-mode :ensure t :defer t)
     (use-package markdown-mode :ensure t :defer t )
-    (use-package projectile :ensure t :defer t :init (projectile-mode) :commands (projectile-mode))
   #+END_SRC
 * Org
   Org mode is wonderful. Org trello is helpful.

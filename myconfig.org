@@ -27,16 +27,16 @@
 
    Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
    #+BEGIN_SRC emacs-lisp
-   (use-package php-extras :defer t :ensure t :after php-mode)   
-   (use-package php-auto-yasnippets :disabled :defer t :ensure t :after php-mode
-    bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
-   (use-package php-eldoc :defer t :ensure t :after php-mode)
-   (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
+     (use-package php-extras :defer t :ensure t :after php-mode)   
+     (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
+       :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
+     (use-package php-eldoc :defer t :ensure t :after php-mode)
+     (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
    #+END_SRC
 
    Refactoring tool php-refactor-mode
    #+BEGIN_SRC emacs-lisp
-   (use-package php-refactor-mode :defer t :init (add-hook 'php-mode-hook #'php-refactor-mode))   
+   (use-package php-refactor-mode :ensure t :defer t :init (add-hook 'php-mode-hook #'php-refactor-mode))   
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.
@@ -59,7 +59,9 @@
                    ("C-M-x" . js-send-last-sexp-and-go)
                    ("C-c C-b" . js-send-buffer-and-go)
                    ("C-c l" . js-load-file-and-go)))
-     (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode))
+     (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
+       :config (js2r-add-keybindings-with-prefix "C-c C-m"))
+
    #+END_SRC
 ** Python
    Elpy is good to me.
@@ -88,9 +90,7 @@
       (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
       (global-set-key (kbd "<f1> l") 'counsel-find-library)
       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-      (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-      (setq magit-completing-read-function 'ivy-completing-read)
-      )
+      (setq magit-completing-read-function 'ivy-completing-read))
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp

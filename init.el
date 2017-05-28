@@ -19,9 +19,11 @@
 
 ;; Org Init File. Everything is in here!
 (org-babel-load-file (concat user-emacs-directory "myconfig.org"))
-;; My emacs-lisp scripts.
-(add-to-list 'load-path (concat user-emacs-directory "lisp/"))
+
 ;; Email
-(require 'init-mu4e)
+(use-package init-mu4e :load-path "lisp/" :commands mu4e)
+
 ;; Org/Google-Calendar integration.
-(require 'init-orggcal)
+(use-package init-orggcal :load-path "lisp/")
+
+(use-package ghub-credentials :load-path "lisp/")

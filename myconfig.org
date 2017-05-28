@@ -7,22 +7,24 @@
      (use-package web-mode :ensure t :defer t
        :config (setq web-mode-code-indent-offset 2) (setq web-mode-markup-indent-offset 2)
        :mode "\\.html?\\'")
-     (use-package emmet-mode :ensure t
+     (use-package emmet-mode :ensure t :defer t
        :init (add-hook 'web-mode-hook #'emmet-mode)
        :config
        (add-hook 'sgml-mode-hook #'emmet-mode)
-       (add-hook 'css-mode-hook #'emmet-mode)
-       )
+       (add-hook 'css-mode-hook #'emmet-mode))
    #+END_SRC
 ** PHP
    php-mode is the major mode for editing PHP files.
    #+BEGIN_SRC emacs-lisp
-   (use-package php-mode :defer t :ensure t :mode "\\.php$"
-     :init
-     (add-hook 'php-mode-hook (lambda() (add-to-list 'company-backends '(company-gtags php-extras-company))))
-     :config
-     (setq php-mode-coding-style 'psr2)
-     (php-eldoc-enable))   
+     (use-package php-mode :defer t :ensure t :mode "\\.php$"
+       :init
+       (add-hook 'php-mode-hook 
+		 (lambda() (add-to-list
+			    (make-local-variable 'company-backends)
+			    '(company-gtags php-extras-company company-keywords company-files company-dabbrev))))
+       :config
+       (setq php-mode-coding-style 'psr2)
+       (php-eldoc-enable))
    #+END_SRC
 
    Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
@@ -43,24 +45,21 @@
    #+BEGIN_SRC emacs-lisp
    (use-package phpunit :ensure t :defer t)
    (use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard 'PSR2))
-   (use-package php-boris :defer t)
    (use-package phan :defer t)
    (use-package fluca-php :load-path "site-lisp/")
    #+END_SRC
 ** Javascript
    js2-mode, js-comint and tern.
    #+BEGIN_SRC emacs-lisp
-     (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode) (add-hook 'web-mode-hook #'tern-mode))
-     (use-package company-tern :ensure t :defer t :after tern :config (add-to-list 'company-backends 'company-tern))
      (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
-     (use-package js-comint :disabled :ensure t :defer t :after js2-mode
-       :bind (:map js2-mode-map
-                   ("C-x C-e" . js-send-last-sexp)
-                   ("C-M-x" . js-send-last-sexp-and-go)
-                   ("C-c C-b" . js-send-buffer-and-go)
-                   ("C-c l" . js-load-file-and-go)))
+     (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode)
+       (add-hook 'web-mode-hook #'tern-mode))
+     (use-package company-tern :ensure t :defer t :after tern
+       :config (add-hook 'js2-mode-hook
+                         (lambda ()
+                           (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
      (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
-       :config (js2r-add-keybindings-with-prefix "C-c C-m"))
+     :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
    #+END_SRC
 ** Python
@@ -75,12 +74,12 @@
 * Useful Packages
   Autocompletion.
   #+BEGIN_SRC emacs-lisp
-    (use-package company :ensure t 
+    (use-package company :ensure t
       :config
       (global-company-mode)
       (setq company-dabbrev-downcase nil))
     (use-package which-key :ensure t :init (which-key-mode 1))
-    (use-package counsel :ensure t
+    (use-package counsel :ensure t :defer t
       :init (ivy-mode 1)
       :config
       (global-set-key (kbd "C-s") 'swiper)
@@ -94,7 +93,7 @@
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp
-    (use-package flycheck :ensure t
+    (use-package flycheck :ensure t :defer t
       :init (global-flycheck-mode)
       :config
       (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
@@ -109,21 +108,22 @@
 * Org
   Org mode is wonderful. Org trello is helpful.
   #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :ensure org-plus-contrib
-      :bind (("C-c l" . org-store-link)
-           ("C-c a" . org-agenda)
-           ("C-c c" . org-capture)
-           ("C-c b" . org-iswitchb))
-      :init (setq org-directory "~/orgfiles"
-                  org-default-notes-file (concat org-directory "/notes.org")
-                  org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
-                                           "* TODO %?\n  %i\n  %a")
-                                          ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-                                           "* %?\n\n%^T\n\n")
-                                          ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
-                                           "* To-Do %?\n %i\n %a"))))
-    (use-package org-trello :ensure t :defer t :config (setq org-trello-current-prefix-keybinding "C-c o"))
+        (use-package org
+          :ensure org-plus-contrib
+          :defer t
+          :bind (("C-c l" . org-store-link)
+               ("C-c a" . org-agenda)
+               ("C-c c" . org-capture)
+               ("C-c b" . org-iswitchb))
+          :init (setq org-directory "~/orgfiles"
+                      org-default-notes-file (concat org-directory "/notes.org")
+                      org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
+                                               "* TODO %?\n  %i\n  %a")
+                                              ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
+                                               "* %?\n\n%^T\n\n")
+                                              ("o" "Trello Card" entry (file "~/orgfiles/trello.org")
+                                               "* To-Do %?\n %i\n %a"))))
+        (use-package org-trello :ensure t :defer t :config (setq org-trello-current-prefix-keybinding "C-c o"))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.

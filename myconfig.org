@@ -136,11 +136,14 @@
   (setq custom-file (concat user-emacs-directory "custom.el"))
   (load custom-file)
   #+END_SRC
+
   I use a backup directory to keep =~= files from cluttering the directories.
   #+BEGIN_SRC emacs-lisp
   (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
   #+END_SRC
-  Some preferences include no startup screen, spaces instead of tabs, using y and n to answer yes/no prompts, and showing matching parentheses.
+
+  Some preferences include no startup screen, spaces instead of tabs, 
+  using y and n to answer yes/no prompts, and showing matching parentheses.
   #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-screen t)
   (setq-default indent-tabs-mode nil)
@@ -148,10 +151,12 @@
   (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
   (show-paren-mode)  
   #+END_SRC
+
   Current theme is Challenger Deep.
   #+BEGIN_SRC emacs-lisp
   (use-package challenger-deep-theme :ensure t)
   #+END_SRC
+
   Undo Tree is pretty cool.
   #+BEGIN_SRC emacs-lisp
   (use-package undo-tree :ensure t :init (global-undo-tree-mode t))

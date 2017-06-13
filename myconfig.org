@@ -65,7 +65,7 @@
 ** Python
    Elpy is good to me.
    #+BEGIN_SRC emacs-lisp
-     (use-package elpy :disabled :defer t :ensure t
+     (use-package elpy :defer t :ensure t
        :init
        (elpy-enable)
        (setq elpy-rpc-python-command "python3")
@@ -90,6 +90,7 @@
       (global-set-key (kbd "<f1> l") 'counsel-find-library)
       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
       (setq magit-completing-read-function 'ivy-completing-read))
+     (use-package ivy-hydra :ensure t)
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp
@@ -155,6 +156,7 @@
   Current theme is Challenger Deep.
   #+BEGIN_SRC emacs-lisp
   (use-package challenger-deep-theme :ensure t)
+  (use-package zenburn-theme :ensure t :defer t)
   #+END_SRC
 
   Undo Tree is pretty cool.

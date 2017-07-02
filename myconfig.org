@@ -68,8 +68,8 @@
      (use-package elpy :defer t :ensure t
        :init
        (elpy-enable)
-       (setq elpy-rpc-python-command "python3")
-       (setq python-shell-interpreter "python3"))
+       :config
+       (setq python-indent-offset 4))
    #+END_SRC
 * Useful Packages
   Autocompletion.
@@ -90,7 +90,8 @@
       (global-set-key (kbd "<f1> l") 'counsel-find-library)
       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
       (setq magit-completing-read-function 'ivy-completing-read))
-     (use-package ivy-hydra :ensure t)
+    (use-package ivy-hydra :ensure t :defer t)
+    (use-package counsel-projectile :ensure t :defer t :init (projectile-mode))
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp

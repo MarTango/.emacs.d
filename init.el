@@ -22,3 +22,6 @@
 
 ;; Org/Google-Calendar integration.
 (use-package init-orggcal :load-path "lisp/")
+
+;; For GPG passphrase stuff
+(setf epa-pinentry-mode 'loopback)

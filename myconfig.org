@@ -51,15 +51,20 @@
 ** Javascript
    js2-mode, js-comint and tern.
    #+BEGIN_SRC emacs-lisp
-     (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
-     (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode)
-       (add-hook 'web-mode-hook #'tern-mode))
-     (use-package company-tern :ensure t :defer t :after tern
-       :config (add-hook 'js2-mode-hook
-                         (lambda ()
-                           (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
-     (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
-     :config (js2r-add-keybindings-with-prefix "C-c C-m"))
+         (use-package js2-mode :ensure t :defer t :mode "\\.(j|g)s\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+         (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode)
+           (add-hook 'web-mode-hook #'tern-mode))
+         (use-package company-tern :ensure t :defer t :after tern
+           :config (add-hook 'js2-mode-hook
+                             (lambda ()
+                               (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
+         (use-package skewer-mode :ensure t :defer t
+           :commands (run-skewer skewer-mode skewer-repl)
+           :config (add-hook 'js2-mode-hfook #'skewer-mode)
+           (add-hook 'css-mode-hook #'skewer-css-mode)
+           (add-hook 'web-mode-hook #'skewer-html-mode))
+         (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
+         :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
    #+END_SRC
 ** Python

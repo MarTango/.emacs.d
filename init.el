@@ -20,8 +20,6 @@
 ;; Org Init File. Everything is in here!
 (org-babel-load-file (concat user-emacs-directory "myconfig.org"))
 
-;; Org/Google-Calendar integration.
-(use-package init-orggcal :load-path "lisp/")
-
 ;; For GPG passphrase stuff
+(defvar epa-pinentry-mode)
 (setf epa-pinentry-mode 'loopback)

@@ -23,3 +23,9 @@
 ;; For GPG passphrase stuff
 (defvar epa-pinentry-mode)
 (setf epa-pinentry-mode 'loopback)
+
+
+;; flycheck-phan
+;; (use-package flycheck-phanclient :load-path "/Users/martintang/.emacs.d/lisp/flycheck-phanclient/")
+;; (add-to-list 'load-path "/Users/martintang/.emacs.d/lisp/flycheck-phanclient/")
+;; (require 'flycheck-phanclient)

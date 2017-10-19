@@ -5,9 +5,10 @@
 ** HTML
    #+BEGIN_SRC emacs-lisp
      (use-package web-mode :ensure t :defer t
+       :init (setq css-indent-offset 2)
        :config (setq web-mode-code-indent-offset 2) (setq web-mode-markup-indent-offset 2)
        :mode "\\.html?\\'")
-     (use-package emmet-mode :ensure t :defer t
+     (use-package emmet-mode :defer t
        :init (add-hook 'web-mode-hook #'emmet-mode)
        :config
        (add-hook 'sgml-mode-hook #'emmet-mode)
@@ -58,7 +59,7 @@
                            (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
      (use-package skewer-mode :ensure t :defer t
        :commands (run-skewer skewer-mode skewer-repl)
-       :config (add-hook 'js2-mode-hfook #'skewer-mode)
+       :config (add-hook 'js2-mode-hook #'skewer-mode)
        (add-hook 'css-mode-hook #'skewer-css-mode)
        (add-hook 'web-mode-hook #'skewer-html-mode))
      (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
@@ -76,7 +77,7 @@
    #+END_SRC
 ** ESS
    #+BEGIN_SRC emacs-lisp
-   (use-package ess :ensure t)
+   (use-package ess :defer t)
    #+END_SRC
 * Useful Packages
   Autocompletion.
@@ -97,41 +98,44 @@
       (global-set-key (kbd "<f1> l") 'counsel-find-library)
       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
       (setq magit-completing-read-function 'ivy-completing-read))
-    (use-package ivy-hydra :ensure t :defer t)
-    (use-package counsel-projectile :ensure t :defer t :init (projectile-mode))
+    (use-package ivy-hydra :defer t)
+    ;;(use-package counsel-projectile :defer t :init (projectile-mode))
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck :ensure t :defer t
       :init (global-flycheck-mode)
       :config
-      (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+      (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+      (setq flycheck-phpcs-standard "PSR2"))
   #+END_SRC
   Some other useful packages..
   #+BEGIN_SRC emacs-lisp
     (use-package eldoc :config (global-eldoc-mode))
     (use-package json-mode :ensure t :defer t)
     (use-package csv-mode :ensure t :defer t)
-    (use-package markdown-mode :ensure t :defer t )
+    (use-package markdown-mode :ensure t :defer t)
+    (use-package yaml-mode :ensure t :defer t)
   #+END_SRC
 * Org
   Org mode is wonderful. Org trello is helpful.
   #+BEGIN_SRC emacs-lisp
     (use-package org
-      :ensure org-plus-contrib
+      ;;:ensure org-plus-contrib
       :defer t
       :bind (("C-c l" . org-store-link)
              ("C-c a" . org-agenda)
              ("C-c c" . org-capture)
              ("C-c b" . org-iswitchb))
       :init (setq org-directory "~/orgfiles"
-                  org-capture-templates '(("t" "Task" entry (file+headline "~/orgfiles/todo.org" "Tasks")
+                  org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "Tasks")
                                            "* TODO %?\n  %i\n  %a")
-                                          ("e" "Calendar Event" entry (file "~/orgfiles/gcal.org")
-                                           "* %?\n\n%^T\n\n")
-                                          ("o" "Trello Card" entry (file "~/orgfiles/martin.trello")
-                                           "* To-Do %?\n %i\n %a"))))
-    (use-package org-trello :ensure t :defer t :config (setq org-trello-current-prefix-keybinding "C-c o"))
+                                          ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "Tickler")
+                                           "* %i%? \n %U"))
+                  org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+                                       ("~/gtd/someday.org" :level . 1)
+                                       ("~/gtd/tickler.org" :maxlevel . 2))))
+      (use-package org-trello :ensure t :defer t :config (setq org-trello-current-prefix-keybinding "C-c o"))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.
@@ -161,10 +165,10 @@
   (show-paren-mode)  
   #+END_SRC
 
-  Current theme is Challenger Deep.
+  Current theme is =Challenger Deep= Zenburn.
   #+BEGIN_SRC emacs-lisp
-  (use-package challenger-deep-theme :ensure t)
-  (use-package zenburn-theme :ensure t :defer t)
+  (use-package challenger-deep-theme :ensure t :defer t)
+  (use-package zenburn-theme :ensure t)
   #+END_SRC
 
   Undo Tree is pretty cool.

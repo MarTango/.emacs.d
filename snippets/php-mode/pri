@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Insert a private property at point
+# key: pri
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 't))
+# --
+private $0

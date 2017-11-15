@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: Insert a public property at point
+# key: pub
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 't))
+# --
+public $0

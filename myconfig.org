@@ -38,13 +38,13 @@
 
    Refactoring tool php-refactor-mode
    #+BEGIN_SRC emacs-lisp
-   (use-package php-refactor-mode :ensure t :defer t :init (add-hook 'php-mode-hook #'php-refactor-mode))   
+   (use-package php-refactor-mode :load-path "site-lisp/" :defer t :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))   
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.
    #+BEGIN_SRC emacs-lisp
    (use-package phpunit :ensure t :defer t)
-   (use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard 'PSR2))
+   (use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard "PSR2"))
    (use-package phan :defer t)
    (use-package fluca-php :load-path "site-lisp/")
    #+END_SRC
@@ -117,25 +117,29 @@
     (use-package markdown-mode :ensure t :defer t)
     (use-package yaml-mode :ensure t :defer t)
   #+END_SRC
+  Docker things
+  #+BEGIN_SRC emacs-lisp
+    (use-package docker :ensure t)
+  #+END_SRC
 * Org
   Org mode is wonderful. Org trello is helpful.
   #+BEGIN_SRC emacs-lisp
     (use-package org
-      ;;:ensure org-plus-contrib
+      :ensure org-plus-contrib
       :defer t
       :bind (("C-c l" . org-store-link)
              ("C-c a" . org-agenda)
              ("C-c c" . org-capture)
              ("C-c b" . org-iswitchb))
-      :init (setq org-directory "~/orgfiles"
+      :init (setq org-directory "~/Documents"
                   org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "Tasks")
                                            "* TODO %?\n  %i\n  %a")
                                           ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "Tickler")
                                            "* %i%? \n %U"))
                   org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
                                        ("~/gtd/someday.org" :level . 1)
-                                       ("~/gtd/tickler.org" :maxlevel . 2))))
-      (use-package org-trello :ensure t :defer t :config (setq org-trello-current-prefix-keybinding "C-c o"))
+                                       ("~/gtd/tickler.org" :maxlevel . 2))
+                  org-agenda-files '("~/gtd/gtd.org", "~/gtd/inbox.org")))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.
@@ -167,8 +171,8 @@
 
   Current theme is =Challenger Deep= Zenburn.
   #+BEGIN_SRC emacs-lisp
-  (use-package challenger-deep-theme :ensure t :defer t)
-  (use-package zenburn-theme :ensure t)
+  (use-package challenger-deep-theme :ensure t)
+  (use-package zenburn-theme :ensure t :defer t)
   #+END_SRC
 
   Undo Tree is pretty cool.

@@ -8,7 +8,7 @@
        :init (setq css-indent-offset 2)
        :config (setq web-mode-code-indent-offset 2) (setq web-mode-markup-indent-offset 2)
        :mode "\\.html?\\'")
-     (use-package emmet-mode :defer t
+     (use-package emmet-mode :ensure t :defer t
        :init (add-hook 'web-mode-hook #'emmet-mode)
        :config
        (add-hook 'sgml-mode-hook #'emmet-mode)
@@ -38,7 +38,7 @@
 
    Refactoring tool php-refactor-mode
    #+BEGIN_SRC emacs-lisp
-   (use-package php-refactor-mode :load-path "site-lisp/" :defer t :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))   
+   (use-package php-refactor-mode :load-path "site-lisp/" :defer t :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.
@@ -122,7 +122,7 @@
     (use-package docker :ensure t)
   #+END_SRC
 * Org
-  Org mode is wonderful. Org trello is helpful.
+  Org mode is wonderful.
   #+BEGIN_SRC emacs-lisp
     (use-package org
       :ensure org-plus-contrib
@@ -134,12 +134,12 @@
       :init (setq org-directory "~/Documents"
                   org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "Tasks")
                                            "* TODO %?\n  %i\n  %a")
-                                          ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "Tickler")
+                                          ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "Tickles")
                                            "* %i%? \n %U"))
                   org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
                                        ("~/gtd/someday.org" :level . 1)
                                        ("~/gtd/tickler.org" :maxlevel . 2))
-                  org-agenda-files '("~/gtd/gtd.org", "~/gtd/inbox.org")))
+                  org-agenda-files '("~/gtd/gtd.org", "~/gtd/inbox.org", "~/gtd/tickler.org")))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.

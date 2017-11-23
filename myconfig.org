@@ -79,6 +79,10 @@
    #+BEGIN_SRC emacs-lisp
    (use-package ess :defer t)
    #+END_SRC
+** Octave
+   #+BEGIN_SRC emacs-lisp
+   (use-package octave-mode :defer t :mode "\\.m\\'")
+   #+END_SRC
 * Useful Packages
   Autocompletion.
   #+BEGIN_SRC emacs-lisp
@@ -141,7 +145,7 @@
                   org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
                                        ("~/gtd/someday.org" :level . 1)
                                        ("~/gtd/tickler.org" :maxlevel . 2))
-                  org-agenda-files '("~/gtd/gtd.org", "~/gtd/inbox.org", "~/gtd/tickler.org")))
+                  org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.

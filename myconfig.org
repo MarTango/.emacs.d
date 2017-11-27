@@ -139,7 +139,7 @@
                   org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
                                        ("~/gtd/someday.org" :level . 1)
                                        ("~/gtd/tickler.org" :maxlevel . 2))
-                  org-agenda-files '("~/gtd/gtd.org", "~/gtd/inbox.org", "~/gtd/tickler.org")))
+                  org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
   #+END_SRC
 * Git Integration
   Magit and magithub are must haves.

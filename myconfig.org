@@ -79,6 +79,10 @@
    #+BEGIN_SRC emacs-lisp
    (use-package ess :defer t)
    #+END_SRC
+** Octave
+   #+BEGIN_SRC emacs-lisp
+   (use-package octave-mode :defer t :mode "\\.m\\'")
+   #+END_SRC
 * Useful Packages
   Autocompletion.
   #+BEGIN_SRC emacs-lisp
@@ -116,6 +120,9 @@
     (use-package csv-mode :ensure t :defer t)
     (use-package markdown-mode :ensure t :defer t)
     (use-package yaml-mode :ensure t :defer t)
+    (use-package ace-window :defer t
+      :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+    (use-package evil :ensure t :init (evil-mode))
   #+END_SRC
   Docker things
   #+BEGIN_SRC emacs-lisp

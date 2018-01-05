@@ -83,6 +83,18 @@
    #+BEGIN_SRC emacs-lisp
    (use-package octave-mode :defer t :mode "\\.m\\'")
    #+END_SRC
+** Java
+   #+BEGIN_SRC emacs-lisp
+     (use-package meghanada :defer t
+       :init
+       (use-package gradle-mode :ensure t)
+       (add-hook 'java-mode-hook
+                 (lambda ()
+                   (gradle-mode)
+                   (meghanada-mode t)
+                   (setq c-basic-offset 2)
+                   (add-hook 'before-save-hook #'meghanada-code-beautify-before-save))))
+   #+END_SRC
 * Useful Packages
   Autocompletion.
   #+BEGIN_SRC emacs-lisp
@@ -123,6 +135,7 @@
     (use-package ace-window :defer t
       :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
     (use-package evil :ensure t :init (evil-mode))
+    (use-package evil-mc :ensure t :after evil-mode :init (global-evil-mc-mode 1))
   #+END_SRC
   Docker things
   #+BEGIN_SRC emacs-lisp
@@ -152,7 +165,7 @@
   Magit and magithub are must haves.
   #+BEGIN_SRC emacs-lisp
   (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
-  (use-package magithub :ensure t :defer t :after magit :config (magithub-feature-autoinject t))
+  (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
   #+END_SRC
 * Preferences
   I use a =custom.el= file to keep =init.el= clean.

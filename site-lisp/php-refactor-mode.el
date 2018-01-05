@@ -118,7 +118,7 @@ END is the ending position of the selected region."
 (defun php-refactor--rename-property ()
   "Rename an existing class property to the specified new name."
   (interactive)
-  (let ((renamed (read-from-minibuffer "Specify new variable name: ")))
+  (let ((renamed (read-from-minibuffer "Specify new property name: ")))
     (php-refactor--run-command
      "rename-property"
      (buffer-file-name)

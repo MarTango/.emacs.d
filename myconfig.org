@@ -33,7 +33,13 @@
      (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
        :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
      (use-package php-eldoc :defer t :ensure t :after php-mode :init (php-eldoc-enable))
-     (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
+     (use-package ggtags :defer t :ensure t
+       :init (add-hook 'php-mode-hook #'ggtags-mode)
+       :config
+       (evil-define-key 'normal ggtags-mode-map
+         "gd" 'ggtags-find-tag-dwim
+         (kbd "C-t") 'ggtags-prev-mark
+         "gf" 'ggtags-find-file))
    #+END_SRC
 
    Refactoring tool php-refactor-mode
@@ -51,17 +57,12 @@
 ** Javascript
    js2-mode, js-comint and tern.
    #+BEGIN_SRC emacs-lisp
-     (use-package js2-mode :ensure t :defer t :mode "\\.js\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+     (use-package js2-mode :ensure t :defer t :mode "\\.\\(g\\|j\\)s\\'" :interpreter "node" :config (setq js2-basic-offset 2))
      (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
      (use-package company-tern :ensure t :defer t :after tern
        :config (add-hook 'js2-mode-hook
                          (lambda ()
                            (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
-     (use-package skewer-mode :ensure t :defer t
-       :commands (run-skewer skewer-mode skewer-repl)
-       :config (add-hook 'js2-mode-hook #'skewer-mode)
-       (add-hook 'css-mode-hook #'skewer-css-mode)
-       (add-hook 'web-mode-hook #'skewer-html-mode))
      (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
      :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
@@ -83,18 +84,6 @@
    #+BEGIN_SRC emacs-lisp
    (use-package octave-mode :defer t :mode "\\.m\\'")
    #+END_SRC
-** Java
-   #+BEGIN_SRC emacs-lisp
-     (use-package meghanada :defer t
-       :init
-       (use-package gradle-mode :ensure t)
-       (add-hook 'java-mode-hook
-                 (lambda ()
-                   (gradle-mode)
-                   (meghanada-mode t)
-                   (setq c-basic-offset 2)
-                   (add-hook 'before-save-hook #'meghanada-code-beautify-before-save))))
-   #+END_SRC
 * Useful Packages
   Autocompletion.
   #+BEGIN_SRC emacs-lisp
@@ -104,7 +93,7 @@
       (setq company-dabbrev-downcase nil))
     (use-package which-key :ensure t :init (which-key-mode 1))
     (use-package counsel :ensure t :defer t
-      :init (ivy-mode 1)
+      :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
       :config
       (global-set-key (kbd "C-s") 'swiper)
       (global-set-key (kbd "M-x") 'counsel-M-x)
@@ -134,12 +123,22 @@
     (use-package yaml-mode :ensure t :defer t)
     (use-package ace-window :defer t
       :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
-    (use-package evil :ensure t :init (evil-mode))
+    (use-package evil :ensure t :init (evil-mode) (add-to-list 'evil-emacs-state-modes 'eshell-mode))
     (use-package evil-mc :ensure t :after evil-mode :init (global-evil-mc-mode 1))
   #+END_SRC
   Docker things
   #+BEGIN_SRC emacs-lisp
     (use-package docker :ensure t)
+  #+END_SRC
+  Neotree
+  #+BEGIN_SRC emacs-lisp
+    (use-package neotree :ensure t
+      :init (add-hook 'neotree-mode-hook
+                      (lambda ()
+                        (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+                        (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
+                        (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+                        (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter))))
   #+END_SRC
 * Org
   Org mode is wonderful.
@@ -189,10 +188,8 @@
   (show-paren-mode)  
   #+END_SRC
 
-  Current theme is =Challenger Deep= Zenburn.
   #+BEGIN_SRC emacs-lisp
-  (use-package challenger-deep-theme :ensure t)
-  (use-package zenburn-theme :ensure t :defer t)
+    (use-package doom-themes :load-path "site-lisp/emacs-doom-themes" :init (require 'doom-themes) (load-theme 'doom-one t))
   #+END_SRC
 
   Undo Tree is pretty cool.

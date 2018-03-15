@@ -16,7 +16,7 @@
 (require 'bind-key)
 
 ;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;;
-
+(use-package async :ensure t :init (setq async-bytecomp-allowed-packages '(all)) (async-bytecomp-package-mode 1))
 ;; Org Init File. Everything is in here!
 (org-babel-load-file (concat user-emacs-directory "myconfig.org"))
 

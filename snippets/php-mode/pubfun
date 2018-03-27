@@ -3,7 +3,7 @@
 # key: pubfun
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 't))
 # --
-public function $1()
+public function ${1:name}(${2:$arg, ...})
 {
     $0
 }

@@ -4,27 +4,19 @@
 * Coding
 ** HTML
    #+BEGIN_SRC emacs-lisp
-     (use-package web-mode :ensure t :defer t
-       :init (setq css-indent-offset 2)
+     (use-package web-mode :ensure t :defer t :init (setq css-indent-offset 2)
        :config (setq web-mode-code-indent-offset 2) (setq web-mode-markup-indent-offset 2)
        :mode "\\.html?\\'")
-     (use-package emmet-mode :ensure t :defer t
-       :init (add-hook 'web-mode-hook #'emmet-mode)
-       :config
-       (add-hook 'sgml-mode-hook #'emmet-mode)
-       (add-hook 'css-mode-hook #'emmet-mode))
+     (use-package emmet-mode :ensure t :defer t :init (add-hook 'web-mode-hook #'emmet-mode)
+       :config (add-hook 'sgml-mode-hook #'emmet-mode) (add-hook 'css-mode-hook #'emmet-mode))
    #+END_SRC
 ** PHP
    php-mode is the major mode for editing PHP files.
    #+BEGIN_SRC emacs-lisp
      (use-package php-mode :defer t :ensure t :mode "\\.php$"
-       :init
-       (add-hook 'php-mode-hook 
-		 (lambda() (add-to-list
-			    (make-local-variable 'company-backends)
-			    '(company-gtags php-extras-company company-keywords company-files company-dabbrev))))
-       :config
-       (setq php-mode-coding-style 'psr2))
+       :init (add-hook 'php-mode-hook (lambda() (add-to-list (make-local-variable 'company-backends)
+                                                             '(company-gtags php-extras-company company-keywords company-files company-dabbrev))))
+       :config (setq php-mode-coding-style 'psr2))
    #+END_SRC
 
    Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
@@ -33,18 +25,13 @@
      (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
        :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
      (use-package php-eldoc :defer t :ensure t :after php-mode :init (php-eldoc-enable))
-     (use-package ggtags :defer t :ensure t
-       :init (add-hook 'php-mode-hook #'ggtags-mode)
-       :config
-       (evil-define-key 'normal ggtags-mode-map
-         "gd" 'ggtags-find-tag-dwim
-         (kbd "C-t") 'ggtags-prev-mark
-         "gf" 'ggtags-find-file))
+     (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
    #+END_SRC
 
    Refactoring tool php-refactor-mode
    #+BEGIN_SRC emacs-lisp
-   (use-package php-refactor-mode :load-path "site-lisp/" :defer t :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
+     (use-package php-refactor-mode :load-path "site-lisp/" :defer t
+       :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.
@@ -70,11 +57,8 @@
 ** Python
    Elpy is good to me.
    #+BEGIN_SRC emacs-lisp
-     (use-package elpy :defer t :ensure t
-       :init
-       (elpy-enable)
-       :config
-       (setq python-indent-offset 4))
+     (use-package elpy :defer t :ensure t :init (elpy-enable)
+       :config (setq python-indent-offset 4))
    #+END_SRC
 ** ESS
    #+BEGIN_SRC emacs-lisp
@@ -87,15 +71,13 @@
 * Useful Packages
   Autocompletion.
   #+BEGIN_SRC emacs-lisp
-    (use-package company :ensure t
-      :config
+    (use-package company :ensure t :config
       (global-company-mode)
       (setq company-dabbrev-downcase nil))
     (use-package which-key :ensure t :init (which-key-mode 1))
     (use-package counsel :ensure t :defer t
       :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
-      :config
-      (global-set-key (kbd "C-s") 'swiper)
+      :config (global-set-key (kbd "C-s") 'swiper)
       (global-set-key (kbd "M-x") 'counsel-M-x)
       (global-set-key (kbd "C-x C-f") 'counsel-find-file)
       (global-set-key (kbd "<f1> f") 'counsel-describe-function)
@@ -104,14 +86,11 @@
       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
       (setq magit-completing-read-function 'ivy-completing-read))
     (use-package ivy-hydra :defer t)
-    ;;(use-package counsel-projectile :defer t :init (projectile-mode))
   #+END_SRC
   Flycheck for syntax checking.
   #+BEGIN_SRC emacs-lisp
-    (use-package flycheck :ensure t :defer t
-      :init (global-flycheck-mode)
-      :config
-      (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+    (use-package flycheck :ensure t :defer t :init (global-flycheck-mode)
+      :config (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
       (setq flycheck-phpcs-standard "PSR2"))
   #+END_SRC
   Some other useful packages..
@@ -121,30 +100,23 @@
     (use-package csv-mode :ensure t :defer t)
     (use-package markdown-mode :ensure t :defer t)
     (use-package yaml-mode :ensure t :defer t)
-    (use-package ace-window :defer t
-      :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
-    (use-package evil :ensure t :init (evil-mode) (add-to-list 'evil-emacs-state-modes 'eshell-mode))
-    (use-package evil-mc :ensure t :after evil-mode :init (global-evil-mc-mode 1))
+    (use-package ace-window :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+    (use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
+    (use-package evil-collection :after evil :ensure t :config (evil-collection-init))
+    (use-package evil-magit :after (evil magit) :ensure t)
   #+END_SRC
   Docker things
   #+BEGIN_SRC emacs-lisp
     (use-package docker :ensure t)
   #+END_SRC
-  Neotree
+  Yasnippets
   #+BEGIN_SRC emacs-lisp
-    (use-package neotree :ensure t
-      :init (add-hook 'neotree-mode-hook
-                      (lambda ()
-                        (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
-                        (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
-                        (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
-                        (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter))))
+    (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
   #+END_SRC
 * Org
   Org mode is wonderful.
   #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :ensure org-plus-contrib
+    (use-package org :ensure org-plus-contrib
       :defer t
       :bind (("C-c l" . org-store-link)
              ("C-c a" . org-agenda)
@@ -189,7 +161,7 @@
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
-    (use-package doom-themes :load-path "site-lisp/emacs-doom-themes" :init (require 'doom-themes) (load-theme 'doom-one t))
+    (use-package gruvbox-theme :ensure t)
   #+END_SRC
 
   Undo Tree is pretty cool.

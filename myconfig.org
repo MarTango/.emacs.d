@@ -100,7 +100,7 @@
     (use-package csv-mode :ensure t :defer t)
     (use-package markdown-mode :ensure t :defer t)
     (use-package yaml-mode :ensure t :defer t)
-    (use-package ace-window :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+    (use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
     (use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
     (use-package evil-collection :after evil :ensure t :config (evil-collection-init))
     (use-package evil-magit :after (evil magit) :ensure t)
@@ -136,7 +136,7 @@
   Magit and magithub are must haves.
   #+BEGIN_SRC emacs-lisp
   (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
-  (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
+  ;; (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
   #+END_SRC
 * Preferences
   I use a =custom.el= file to keep =init.el= clean.

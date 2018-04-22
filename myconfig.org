@@ -14,9 +14,15 @@
    php-mode is the major mode for editing PHP files.
    #+BEGIN_SRC emacs-lisp
      (use-package php-mode :defer t :ensure t :mode "\\.php$"
-       :init (add-hook 'php-mode-hook (lambda() (add-to-list (make-local-variable 'company-backends)
-                                                             '(company-gtags php-extras-company company-keywords company-files company-dabbrev))))
-       :config (setq php-mode-coding-style 'psr2))
+       :init
+       (add-hook 'php-mode-hook
+                 #'(lambda ()
+                     (make-local-variable 'company-backends)
+                     (setq company-backends (copy-tree company-backends))
+                     (setf (car company-backends)
+                           (append '(php-extras-company company-gtags company-keywords) (car company-backends)))
+                     (add-to-list 'company-backends '(company-phpactor))))
+       :config (setq php-mode-coding-style 'psr2 c-basic-offset 4))
    #+END_SRC
 
    Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
@@ -28,10 +34,12 @@
      (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
    #+END_SRC
 
-   Refactoring tool php-refactor-mode
+   Refactoring tools
    #+BEGIN_SRC emacs-lisp
      (use-package php-refactor-mode :load-path "site-lisp/" :defer t
        :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
+     (use-package company-phpactor :load-path "~/hub/phpactor.el"
+       :init (add-hook 'php-mode-hook #'(lambda () (add-to-list 'company-backends '(company-phpactor)))))
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.
@@ -44,7 +52,7 @@
 ** Javascript
    js2-mode, js-comint and tern.
    #+BEGIN_SRC emacs-lisp
-     (use-package js2-mode :ensure t :defer t :mode "\\.\\(g\\|j\\)s\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+     (use-package js2-mode :ensure t :defer t :mode "\\.\\(g\\|j\\)sx?\\'" :interpreter "node" :config (setq js2-basic-offset 2))
      (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
      (use-package company-tern :ensure t :defer t :after tern
        :config (add-hook 'js2-mode-hook
@@ -75,9 +83,10 @@
       (global-company-mode)
       (setq company-dabbrev-downcase nil))
     (use-package which-key :ensure t :init (which-key-mode 1))
-    (use-package counsel :ensure t :defer t
+    (use-package counsel :ensure t
       :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
-      :config (global-set-key (kbd "C-s") 'swiper)
+      :config
+      (global-set-key (kbd "C-s") 'swiper)
       (global-set-key (kbd "M-x") 'counsel-M-x)
       (global-set-key (kbd "C-x C-f") 'counsel-find-file)
       (global-set-key (kbd "<f1> f") 'counsel-describe-function)
@@ -123,12 +132,11 @@
              ("C-c c" . org-capture)
              ("C-c b" . org-iswitchb))
       :init (setq org-directory "~/Documents"
-                  org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "Tasks")
+                  org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "INBOX")
                                            "* TODO %?\n  %i\n  %a")
-                                          ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "Tickles")
+                                          ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "TICKLER")
                                            "* %i%? \n %U"))
                   org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
-                                       ("~/gtd/someday.org" :level . 1)
                                        ("~/gtd/tickler.org" :maxlevel . 2))
                   org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
   #+END_SRC

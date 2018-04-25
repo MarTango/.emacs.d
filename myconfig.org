@@ -25,7 +25,9 @@
        :config (setq php-mode-coding-style 'psr2 c-basic-offset 4))
    #+END_SRC
 
-   Use company and gtags for completion, with php functions provided by php-extras, snippets provided by php-auto-yasnippets and documentation provided by php-eldoc.
+   Use company and gtags for completion, with php functions provided
+   by php-extras, snippets provided by php-auto-yasnippets and
+   documentation provided by php-eldoc.
    #+BEGIN_SRC emacs-lisp
      (use-package php-extras :defer t :ensure t :after php-mode)   
      (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
@@ -39,7 +41,13 @@
      (use-package php-refactor-mode :load-path "site-lisp/" :defer t
        :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
      (use-package company-phpactor :load-path "~/hub/phpactor.el"
-       :init (add-hook 'php-mode-hook #'(lambda () (add-to-list 'company-backends '(company-phpactor)))))
+       :init
+       (add-hook 'php-mode-hook #'(lambda () (add-to-list 'company-backends '(company-phpactor)))))
+     (use-package phpactor :load-path "~/hub/phpactor.el"
+       :after evil
+       :config
+       (evil-define-key 'normal 'php-mode-map
+         "gd" #'phpactor-goto-definition))
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.
@@ -55,9 +63,8 @@
      (use-package js2-mode :ensure t :defer t :mode "\\.\\(g\\|j\\)sx?\\'" :interpreter "node" :config (setq js2-basic-offset 2))
      (use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
      (use-package company-tern :ensure t :defer t :after tern
-       :config (add-hook 'js2-mode-hook
-                         (lambda ()
-                           (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
+       :config
+       (add-hook 'js2-mode-hook #'(lambda () (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
      (use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
      :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 

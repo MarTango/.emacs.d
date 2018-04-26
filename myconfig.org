@@ -40,14 +40,15 @@
    #+BEGIN_SRC emacs-lisp
      (use-package php-refactor-mode :load-path "site-lisp/" :defer t
        :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
-     (use-package company-phpactor :load-path "~/hub/phpactor.el"
+     (use-package company-phpactor :load-path "site-lisp/phpactor.el"
        :init
        (add-hook 'php-mode-hook #'(lambda () (add-to-list 'company-backends '(company-phpactor)))))
-     (use-package phpactor :load-path "~/hub/phpactor.el"
+     (use-package phpactor :load-path "site-lisp/phpactor.el"
        :after evil
        :config
        (evil-define-key 'normal 'php-mode-map
          "gd" #'phpactor-goto-definition))
+     (use-package flycheck-phanclient :load-path "site-lisp/flycheck-phanclient")
    #+END_SRC
 
    PHPUnit for tests, boris for repl, phpcbf for autoformatting.

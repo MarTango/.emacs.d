@@ -1,10 +1,35 @@
-;; Necessary preamble to use use-package
+;;; init.el --- MarTango's .emacs -*- coding: utf-8 ; lexical-binding: t -*-
+
+;; Description: MarTango's .emacs
+;; URL: https://github.com/martango/.emacs.d/init.el
+
+;; This file is NOT part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+;;
+
+;;; Code:
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			 ("marmalade" . "https://marmalade-repo.org/packages/")
-			 ("gnu" . "http://elpa.gnu.org/packages/")
-			 ("org" . "http://orgmode.org/elpa/")))
+                         ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -14,10 +39,10 @@
   (require 'use-package))
 (require 'bind-key)
 
-;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ;;
-(use-package async :ensure t :init (setq async-bytecomp-allowed-packages '(all)) (async-bytecomp-package-mode 1))
-;; Org Init File. Everything is in here!
-(org-babel-load-file (concat user-emacs-directory "myconfig.org"))
+(use-package async :ensure t
+  :config
+  (setq async-bytecomp-allowed-packages '(all))
+  (async-bytecomp-package-mode 1))
 
 ;; For GPG passphrase stuff
 (defvar epa-pinentry-mode)
@@ -25,7 +50,139 @@
     (setf epa-pinentry-mode 'nil)
   (setf epa-pinentry-mode 'loopback))
 
-;; flycheck-phan
-;; (use-package flycheck-phanclient :load-path "/Users/martintang/.emacs.d/lisp/flycheck-phanclient/")
-;; (add-to-list 'load-path "/Users/martintang/.emacs.d/lisp/flycheck-phanclient/")
-;; (require 'flycheck-phanclient)
+(setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
+(setq inhibit-startup-screen t)
+(setq-default indent-tabs-mode nil)
+(fset 'yes-or-no-p 'y-or-n-p)
+(global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
+(show-paren-mode)
+
+;;; Appearance
+
+;; Theme
+(use-package dracula-theme :ensure t :init (load-theme 'dracula t))
+
+;; Hide menu bar
+(menu-bar-mode -1)
+
+
+;;; Packages
+
+(use-package web-mode :ensure t :defer t
+  :config
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2)
+  (defvar css-indent-offset 2)
+  :mode "\\.html?\\'")
+
+(use-package emmet-mode :ensure t :defer t :init
+  (add-hook 'web-mode-hook #'emmet-mode)
+  (add-hook 'sgml-mode-hook #'emmet-mode)
+  (add-hook 'css-mode-hook #'emmet-mode))
+
+(defun my/php-mode-hook ()
+  "Gets run on php-mode load."
+  (defvar company-backends)
+  (add-to-list 'company-backends '(php-extras-company company-gtags company-keywords))
+  (add-to-list 'company-backends 'company-phpactor)
+  (when (eq 0 (buffer-size))
+    (insert "<?php\n\n")))
+
+(use-package php-mode :defer t :ensure t :mode "\\.php$"
+  :init (add-hook 'php-mode-hook #'my/php-mode-hook)
+  :config (setq php-mode-coding-style 'psr2 c-basic-offset 4))
+
+(use-package php-extras :defer t :ensure t :after php-mode)
+(use-package php-auto-yasnippets :defer t :ensure t :after php-mode
+  :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
+(use-package php-eldoc :defer t :ensure t :after php-mode :init (php-eldoc-enable))
+;; (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
+
+(use-package php-refactor-mode :load-path "site-lisp/" :defer t
+  :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
+(use-package company-phpactor :load-path "site-lisp/phpactor.el")
+(use-package phpactor :load-path "site-lisp/phpactor.el"
+  :after (evil php-mode)
+  :config
+  (evil-define-key 'normal php-mode-map
+    "gd" #'phpactor-goto-definition))
+(use-package flycheck-phanclient :load-path "site-lisp/flycheck-phanclient")
+
+(use-package phpunit :ensure t :defer t)
+(use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard "PSR2"))
+(use-package phan :defer t)
+(use-package fluca-php :load-path "site-lisp/")
+(use-package geben :ensure t)
+
+(use-package js2-mode :ensure t :defer t :mode "\\.\\(g\\|j\\)sx?\\'" :interpreter "node" :config (setq js2-basic-offset 2))
+(use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
+(use-package company-tern :ensure t :defer t :after tern
+  :config
+  (add-hook 'js2-mode-hook #'(lambda () (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
+(use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
+  :config (js2r-add-keybindings-with-prefix "C-c C-m"))
+
+(use-package ess :defer t)
+
+(use-package octave-mode :defer t :mode "\\.m\\'")
+
+(use-package company :ensure t :config
+  (global-company-mode)
+  (setq company-dabbrev-downcase nil))
+(use-package which-key :ensure t :init (which-key-mode 1))
+(use-package counsel :ensure t
+  :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
+  :config
+  (global-set-key (kbd "C-s") 'swiper)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  (setq magit-completing-read-function 'ivy-completing-read))
+(use-package ivy-hydra :defer t)
+
+(use-package flycheck :ensure t :defer t :init (global-flycheck-mode)
+  :config (setq flycheck-phpcs-standard "PSR2"))
+
+(use-package eldoc :config (global-eldoc-mode))
+(use-package json-mode :ensure t :defer t)
+(use-package csv-mode :ensure t :defer t)
+(use-package markdown-mode :ensure t :defer t)
+(use-package yaml-mode :ensure t :defer t)
+(use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+(use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
+;; (use-package evil-collection :after evil :ensure t :config (evil-collection-init))
+(use-package evil-magit :after (evil magit) :ensure t)
+(use-package docker :ensure t)
+(use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
+
+(use-package org :ensure org-plus-contrib
+  :defer t
+  :bind (("C-c l" . org-store-link)
+         ("C-c a" . org-agenda)
+         ("C-c c" . org-capture)
+         ("C-c b" . org-iswitchb))
+  :init (setq org-directory "~/Documents"
+              org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "INBOX")
+                                       "* TODO %?\n  %i\n  %a")
+                                      ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "TICKLER")
+                                       "* %i%? \n %U"))
+              org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+                                   ("~/gtd/tickler.org" :maxlevel . 2))
+              org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
+
+(use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
+;; (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
+
+(use-package undo-tree :ensure t :init (global-undo-tree-mode t))
+
+(provide 'init)
+;;; init.el ends here
+
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:

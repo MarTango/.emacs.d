@@ -215,7 +215,7 @@
               org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
 
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
-;; (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
+(use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
 
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 

@@ -11,3 +11,6 @@ bookmarks
 /tramp
 custom.el
 myconfig.el
+.org-id-locations
+anaconda-mode
+magithub

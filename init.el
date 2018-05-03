@@ -58,15 +58,20 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
 (show-paren-mode)
+(menu-bar-mode -1)
 
 ;;; Appearance
 
 ;; Theme
 (use-package dracula-theme :ensure t :init (load-theme 'dracula t))
 
-;; Hide menu bar
-(menu-bar-mode -1)
+(defun my/frame-behaviours (&optional frame)
+  "Set appearance of FRAME depending on terminal or GUI."
+  (with-selected-frame (or frame (selected-frame))
+    (unless window-system
+      (set-face-background 'default "nil" frame))))
 
+(add-hook 'after-make-frame-functions #'my/frame-behaviours)
 
 ;;; Packages
 
@@ -84,15 +89,34 @@
 
 (defun my/php-mode-hook ()
   "Gets run on php-mode load."
-  (defvar company-backends)
+  (make-local-variable company-backends)
   (add-to-list 'company-backends '(php-extras-company company-gtags company-keywords))
   (add-to-list 'company-backends 'company-phpactor)
+  (setq php-mode-coding-style 'psr2
+        c-basic-offset 4)
   (when (eq 0 (buffer-size))
     (insert "<?php\n\n")))
 
-(use-package php-mode :defer t :ensure t :mode "\\.php$"
-  :init (add-hook 'php-mode-hook #'my/php-mode-hook)
-  :config (setq php-mode-coding-style 'psr2 c-basic-offset 4))
+
+(defun my/js2-mode-hook ()
+  "My javascript mode hook."
+  (setq js2-basic-offset 2)
+  (tern-mode)
+  (js2-refactor-mode)
+  (add-to-list (make-local-variable 'company-backends) 'company-tern))
+
+
+(defun my/python-mode-hook ()
+  "My python mode hook."
+  (anaconda-mode)
+  (anaconda-eldoc-mode)
+  (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
+
+(use-package anaconda-mode :defer t :ensure t :init (add-hook 'python-mode-hook #'my/python-mode-hook))
+(use-package company-anaconda :defer t :ensure t :after (company anaconda))
+
+(use-package php-mode :defer t :ensure t
+  :init (add-hook 'php-mode-hook #'my/php-mode-hook))
 
 (use-package php-extras :defer t :ensure t :after php-mode)
 (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
@@ -116,16 +140,19 @@
 (use-package fluca-php :load-path "site-lisp/")
 (use-package geben :ensure t)
 
-(use-package js2-mode :ensure t :defer t :mode "\\.\\(g\\|j\\)sx?\\'" :interpreter "node" :config (setq js2-basic-offset 2))
-(use-package tern :ensure t :defer t :init (add-hook 'js2-mode-hook #'tern-mode))
-(use-package company-tern :ensure t :defer t :after tern
-  :config
-  (add-hook 'js2-mode-hook #'(lambda () (add-to-list (make-local-variable 'company-backends) '(company-tern company-files)))))
-(use-package js2-refactor :ensure t :defer t :init (add-hook 'js2-mode-hook #'js2-refactor-mode)
+(use-package js2-mode :ensure t :defer t
+  :after (tern company-tern js2-refactor)
+  :mode "\\.jsx?\\'"
+  :interpreter "node"
+  :init
+  (add-hook js2-mode-hook #'my/js2-mode-hook))
+
+(use-package tern :ensure t :defer t)
+(use-package company-tern :ensure t :defer t :after tern)
+(use-package js2-refactor :ensure t :after js2-mode
   :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
 (use-package ess :defer t)
-
 (use-package octave-mode :defer t :mode "\\.m\\'")
 
 (use-package company :ensure t :config
@@ -154,9 +181,21 @@
 (use-package markdown-mode :ensure t :defer t)
 (use-package yaml-mode :ensure t :defer t)
 (use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+
 (use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
-;; (use-package evil-collection :after evil :ensure t :config (evil-collection-init))
+(use-package evil-collection :after evil :ensure t
+  :config
+  (evil-collection-init))
+
 (use-package evil-magit :after (evil magit) :ensure t)
+(use-package evil-org :ensure t :after (evil org)
+  :config (add-hook 'org-mode-hook #'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme)))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
 (use-package docker :ensure t)
 (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
 

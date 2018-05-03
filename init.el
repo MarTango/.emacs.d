@@ -89,8 +89,7 @@
 
 (defun my/php-mode-hook ()
   "Gets run on php-mode load."
-  (make-local-variable company-backends)
-  (add-to-list 'company-backends '(php-extras-company company-gtags company-keywords))
+  (make-local-variable 'company-backends)
   (add-to-list 'company-backends 'company-phpactor)
   (setq php-mode-coding-style 'psr2
         c-basic-offset 4)
@@ -115,7 +114,7 @@
 (use-package anaconda-mode :defer t :ensure t :init (add-hook 'python-mode-hook #'my/python-mode-hook))
 (use-package company-anaconda :defer t :ensure t :after (company anaconda))
 
-(use-package php-mode :defer t :ensure t
+(use-package php-mode :ensure t
   :init (add-hook 'php-mode-hook #'my/php-mode-hook))
 
 (use-package php-extras :defer t :ensure t :after php-mode)
@@ -134,8 +133,8 @@
     "gd" #'phpactor-goto-definition))
 (use-package flycheck-phanclient :load-path "site-lisp/flycheck-phanclient")
 
-(use-package phpunit :ensure t :defer t)
-(use-package phpcbf :defer t :ensure t :config (setq phpcbf-standard "PSR2"))
+(use-package phpunit :ensure t)
+(use-package phpcbf :ensure t :config (setq phpcbf-standard "PSR2"))
 (use-package phan :defer t)
 (use-package fluca-php :load-path "site-lisp/")
 (use-package geben :ensure t)

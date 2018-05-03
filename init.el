@@ -21,7 +21,7 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
-;;
+;; This is my (Martin Tang) emacs initialisation file.
 
 ;;; Code:
 (require 'package)

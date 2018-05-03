@@ -218,7 +218,6 @@
 (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
 
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
-
 (provide 'init)
 ;;; init.el ends here
 

@@ -21,9 +21,10 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
-;; This is my (Martin Tang) emacs initialisation file.
+;; This is my (Martin Tang) Emacs initialisation file.
 
 ;;; Code:
+
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -75,6 +76,8 @@
 
 ;;; Packages
 
+;; HTML
+
 (use-package web-mode :ensure t :defer t
   :config
   (setq web-mode-code-indent-offset 2)
@@ -87,6 +90,8 @@
   (add-hook 'sgml-mode-hook #'emmet-mode)
   (add-hook 'css-mode-hook #'emmet-mode))
 
+;; PHP
+
 (defun my/php-mode-hook ()
   "Gets run on php-mode load."
   (make-local-variable 'company-backends)
@@ -96,27 +101,8 @@
   (when (eq 0 (buffer-size))
     (insert "<?php\n\n")))
 
-
-(defun my/js2-mode-hook ()
-  "My javascript mode hook."
-  (setq js2-basic-offset 2)
-  (tern-mode)
-  (js2-refactor-mode)
-  (add-to-list (make-local-variable 'company-backends) 'company-tern))
-
-
-(defun my/python-mode-hook ()
-  "My python mode hook."
-  (anaconda-mode)
-  (anaconda-eldoc-mode)
-  (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
-
-(use-package anaconda-mode :defer t :ensure t :init (add-hook 'python-mode-hook #'my/python-mode-hook))
-(use-package company-anaconda :defer t :ensure t :after (company anaconda))
-
 (use-package php-mode :ensure t
   :init (add-hook 'php-mode-hook #'my/php-mode-hook))
-
 (use-package php-extras :defer t :ensure t :after php-mode)
 (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
   :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
@@ -131,13 +117,22 @@
   :config
   (evil-define-key 'normal php-mode-map
     "gd" #'phpactor-goto-definition))
-(use-package flycheck-phanclient :load-path "site-lisp/flycheck-phanclient")
+(use-package flycheck-phanclient :disabled :load-path "site-lisp/flycheck-phanclient")
 
 (use-package phpunit :ensure t)
 (use-package phpcbf :ensure t :config (setq phpcbf-standard "PSR2"))
 (use-package phan :defer t)
 (use-package fluca-php :load-path "site-lisp/")
 (use-package geben :ensure t)
+
+;; JavaScript
+
+(defun my/js2-mode-hook ()
+  "My javascript mode hook."
+  (setq js2-basic-offset 2)
+  (tern-mode)
+  (js2-refactor-mode)
+  (add-to-list (make-local-variable 'company-backends) 'company-tern))
 
 (use-package js2-mode :ensure t :defer t
   :after (tern company-tern js2-refactor)
@@ -151,41 +146,36 @@
 (use-package js2-refactor :ensure t :after js2-mode
   :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
-(use-package ess :defer t)
-(use-package octave-mode :defer t :mode "\\.m\\'")
 
-(use-package company :ensure t :config
-  (global-company-mode)
-  (setq company-dabbrev-downcase nil))
-(use-package which-key :ensure t :init (which-key-mode 1))
-(use-package counsel :ensure t
-  :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
-  :config
-  (global-set-key (kbd "C-s") 'swiper)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (setq magit-completing-read-function 'ivy-completing-read))
-(use-package ivy-hydra :defer t)
+;; Python
 
-(use-package flycheck :ensure t :defer t :init (global-flycheck-mode)
-  :config (setq flycheck-phpcs-standard "PSR2"))
+(defun my/python-mode-hook ()
+  "My python mode hook."
+  (anaconda-mode)
+  (anaconda-eldoc-mode)
+  (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
 
-(use-package eldoc :config (global-eldoc-mode))
+(use-package anaconda-mode :defer t :ensure t :init (add-hook 'python-mode-hook #'my/python-mode-hook))
+(use-package company-anaconda :defer t :ensure t :after (company anaconda))
+
+;; Languages I don't use.
+
+(use-package ess :disabled :defer t)
+(use-package octave-mode :disabled :defer t :mode "\\.m\\'")
+
+;; Other Modes
+
 (use-package json-mode :ensure t :defer t)
 (use-package csv-mode :ensure t :defer t)
 (use-package markdown-mode :ensure t :defer t)
 (use-package yaml-mode :ensure t :defer t)
-(use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+
+;; Keybindings
 
 (use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
 (use-package evil-collection :after evil :ensure t
   :config
   (evil-collection-init))
-
 (use-package evil-magit :after (evil magit) :ensure t)
 (use-package evil-org :ensure t :after (evil org)
   :config (add-hook 'org-mode-hook #'evil-org-mode)
@@ -195,8 +185,7 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
-(use-package docker :ensure t)
-(use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
+;; Org-Mode
 
 (use-package org :ensure org-plus-contrib
   :defer t
@@ -213,14 +202,40 @@
                                    ("~/gtd/tickler.org" :maxlevel . 2))
               org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
 
+;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
 (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
-
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
+(use-package company :ensure t :config
+  (global-company-mode)
+  (setq company-dabbrev-downcase nil))
+(use-package which-key :ensure t :init (which-key-mode 1))
+(use-package counsel :ensure t
+  :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
+  :config
+  (global-set-key (kbd "C-s") 'swiper)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  (setq magit-completing-read-function 'ivy-completing-read))
+(use-package ivy-hydra :defer t)
+(use-package docker :ensure t)
+(use-package flycheck :ensure t :defer t :init (global-flycheck-mode)
+  :config (setq flycheck-phpcs-standard "PSR2"))
+(use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
+(use-package eldoc :config (global-eldoc-mode))
+(use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+
+
+
+
 
 (provide 'init)
 ;;; init.el ends here
 
 ;; Local Variables:
-;; byte-compile-warnings: (not free-vars)
+;; byte-compile-warnings: (not free-vars noruntime)
 ;; End:

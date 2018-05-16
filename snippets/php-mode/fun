@@ -3,7 +3,7 @@
 # key: fun
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 't))
 # --
-${2:$$(yas-choose-value '("public" "protected" "private"))} function $1()
+${3:$$(yas-choose-value '("public" "protected" "private"))} function $1($2)
 {
     $0
 }

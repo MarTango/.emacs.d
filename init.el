@@ -125,7 +125,29 @@
 (use-package phpcbf :ensure t :config (setq phpcbf-standard "PSR2"))
 (use-package phan :defer t)
 (use-package fluca-php :load-path "site-lisp/")
-(use-package geben :ensure t)
+
+(defun geben-php-run ()
+  "Run the current script with xdebug configuration to point to geben listener."
+  (interactive)
+  (call-interactively #'geben)
+  (let ((cmd (list "php" "-d"
+                   "xdebug.remote_enable=on" "-d"
+                   "xdebug.remote_host=127.0.0.1" "-d"
+                   "xdebug.remote_port=9000" "-d"
+                   "xdebug.remote_handler=dbgp" "-d"
+                   "xdebug.idekey=geben" "-d"
+                   "xdebug.remote_autostart=On"
+                   (buffer-file-name))))
+    (apply #'start-process  "GebenPHPDebug" "*geben*" cmd)))
+
+(use-package geben
+  :ensure t
+  :init
+  (add-hook 'geben-mode-hook #'evil-emacs-state)
+  :config
+  (evil-define-key 'normal php-mode-map
+    (kbd "C-c C-d") #'geben-php-run))
+
 
 ;; JavaScript
 

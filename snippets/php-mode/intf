@@ -1,9 +1,9 @@
 # -*- mode: snippet -*-
-# name: Insert a public method at point
-# key: pubfun
+# name: Insert an interface
+# key: intf
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 't))
 # --
-public function $1($2)
+interface ${1:`(car (split-string (buffer-name) "\\.php"))`}
 {
     $0
 }

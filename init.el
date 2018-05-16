@@ -95,7 +95,8 @@
 (defun my/php-mode-hook ()
   "Gets run on php-mode load."
   (make-local-variable 'company-backends)
-  (add-to-list 'company-backends 'company-phpactor)
+  (add-to-list 'company-backends '(company-phpactor php-extras-company company-dabbrev-code))
+  ;; (flycheck-select-checker 'phpstan)
   (setq php-mode-coding-style 'psr2
         c-basic-offset 4)
   (when (eq 0 (buffer-size))
@@ -107,6 +108,7 @@
 (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
   :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
 (use-package php-eldoc :defer t :ensure t :after php-mode :init (php-eldoc-enable))
+(use-package flycheck-phpstan :ensure t :after (php-mode flycheck))
 ;; (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
 
 (use-package php-refactor-mode :load-path "site-lisp/" :defer t
@@ -130,19 +132,26 @@
 (defun my/js2-mode-hook ()
   "My javascript mode hook."
   (setq js2-basic-offset 2)
-  (tern-mode)
+  (tern-mode t)
   (js2-refactor-mode)
   (add-to-list (make-local-variable 'company-backends) 'company-tern))
 
-(use-package js2-mode :ensure t :defer t
-  :after (tern company-tern js2-refactor)
-  :mode "\\.jsx?\\'"
-  :interpreter "node"
+(use-package js2-mode
+  :ensure t
+  :mode "\\.js\\'"
+  :interpreter ("node" . js2-mode)
   :init
-  (add-hook js2-mode-hook #'my/js2-mode-hook))
+  (add-hook 'js2-mode-hook #'my/js2-mode-hook))
 
-(use-package tern :ensure t :defer t)
-(use-package company-tern :ensure t :defer t :after tern)
+(use-package tern
+  :ensure t
+  :defer t
+  :config
+  (evil-define-key 'normal tern-mode-keymap
+    "gd" #'tern-find-definition
+    (kbd "C-t") #'tern-pop-find-definition))
+
+(use-package company-tern :ensure t :after tern)
 (use-package js2-refactor :ensure t :after js2-mode
   :config (js2r-add-keybindings-with-prefix "C-c C-m"))
 
@@ -165,7 +174,7 @@
 
 ;; Other Modes
 
-(use-package json-mode :ensure t :defer t)
+(use-package json-mode :ensure t :defer t :init (add-hook 'json-mode-hook (lambda () (setq js-indent-level 2))))
 (use-package csv-mode :ensure t :defer t)
 (use-package markdown-mode :ensure t :defer t)
 (use-package yaml-mode :ensure t :defer t)
@@ -178,10 +187,9 @@
   (evil-collection-init))
 (use-package evil-magit :after (evil magit) :ensure t)
 (use-package evil-org :ensure t :after (evil org)
-  :config (add-hook 'org-mode-hook #'evil-org-mode)
-  (add-hook 'evil-org-mode-hook
-            (lambda ()
-              (evil-org-set-key-theme)))
+  :config
+  (add-hook 'org-mode-hook #'evil-org-mode)
+  (add-hook 'evil-org-mode-hook #'evil-org-set-key-theme)
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
@@ -189,18 +197,22 @@
 
 (use-package org :ensure org-plus-contrib
   :defer t
-  :bind (("C-c l" . org-store-link)
-         ("C-c a" . org-agenda)
-         ("C-c c" . org-capture)
-         ("C-c b" . org-iswitchb))
-  :init (setq org-directory "~/Documents"
-              org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "INBOX")
-                                       "* TODO %?\n  %i\n  %a")
-                                      ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "TICKLER")
-                                       "* %i%? \n %U"))
-              org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
-                                   ("~/gtd/tickler.org" :maxlevel . 2))
-              org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
+  :bind
+  (("C-c l" . org-store-link)
+   ("C-c a" . org-agenda)
+   ("C-c c" . org-capture)
+   ("C-c b" . org-iswitchb)
+   ("C-c C-x" . org-clock-goto)
+   ("C-'" . org-cycle-agenda-files))
+  :init
+  (setq org-directory "~/Documents"
+        org-capture-templates '(("t" "TODO [INBOX]" entry (file+headline "~/gtd/inbox.org" "INBOX")
+                                 "* TODO %?\n  %i\n  %a")
+                                ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "TICKLER")
+                                 "* %i%? \n %U"))
+        org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+                             ("~/gtd/tickler.org" :maxlevel . 2))
+        org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
@@ -208,7 +220,8 @@
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 (use-package company :ensure t :config
   (global-company-mode)
-  (setq company-dabbrev-downcase nil))
+  (setq company-dabbrev-downcase nil
+        company-dabbrev-ignore-case nil))
 (use-package which-key :ensure t :init (which-key-mode 1))
 (use-package counsel :ensure t
   :init (ivy-mode 1) (use-package ivy-hydra :ensure t)

@@ -3,7 +3,7 @@
 # key: prifun
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 't))
 # --
-private function $1()
+private function $1($2)
 {
     $0
 }

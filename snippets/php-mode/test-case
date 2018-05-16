@@ -3,9 +3,9 @@
 # key: testcase
 # --
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
-class ${1:Class}Test extends TestCase
+class ${1:`(car (split-string (buffer-name) "\\.php"))`} extends TestCase
 {
     public function setUp()
     {

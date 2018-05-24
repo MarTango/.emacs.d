@@ -127,7 +127,7 @@
 (use-package fluca-php :load-path "site-lisp/")
 
 (defun geben-php-run ()
-  "Run the current script with xdebug configuration to point to geben listener."
+  "Start the geben listener, then run the current script with xdebug configuration to point to geben listener."
   (interactive)
   (call-interactively #'geben)
   (let ((cmd (list "php" "-d"
@@ -142,6 +142,7 @@
 
 (use-package geben
   :ensure t
+  :after evil
   :init
   (add-hook 'geben-mode-hook #'evil-emacs-state)
   :config
@@ -232,9 +233,9 @@
                                  "* TODO %?\n  %i\n  %a")
                                 ("T" "Tickler" entry (file+headline "~/gtd/tickler.org" "TICKLER")
                                  "* %i%? \n %U"))
-        org-refile-targets '(("~/gtd/gtd.org" :maxlevel . 3)
+        org-refile-targets '(("~/gtd/todo.org" :maxlevel . 3)
                              ("~/gtd/tickler.org" :maxlevel . 2))
-        org-agenda-files '("~/gtd/gtd.org" "~/gtd/inbox.org" "~/gtd/tickler.org")))
+        org-agenda-files '("~/gtd/inbox.org" "~/gtd/todo.org" "~/gtd/tickler.org")))
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))

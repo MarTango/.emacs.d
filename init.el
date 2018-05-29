@@ -1,4 +1,4 @@
-;;; init.el --- MarTango's .emacs -*- coding: utf-8 ; lexical-binding: t -*-
+;;; init.el --- MarTango's .emacs -*- coding: utf-8; lexical-binding: t; byte-compile-warnings: (not free-vars noruntime); -*-
 
 ;; Description: MarTango's .emacs
 ;; URL: https://github.com/martango/.emacs.d/init.el
@@ -246,8 +246,11 @@
   (setq company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil))
 (use-package which-key :ensure t :init (which-key-mode 1))
-(use-package counsel :ensure t
-  :init (ivy-mode 1) (use-package ivy-hydra :ensure t)
+
+(use-package counsel
+  :ensure t
+  :init
+  (ivy-mode 1)
   :config
   (global-set-key (kbd "C-s") 'swiper)
   (global-set-key (kbd "M-x") 'counsel-M-x)
@@ -257,7 +260,9 @@
   (global-set-key (kbd "<f1> l") 'counsel-find-library)
   (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
   (setq magit-completing-read-function 'ivy-completing-read))
+
 (use-package ivy-hydra :defer t)
+
 (use-package docker :ensure t)
 (use-package flycheck :ensure t :defer t :init (global-flycheck-mode)
   :config (setq flycheck-phpcs-standard "PSR2"))
@@ -265,13 +270,5 @@
 (use-package eldoc :config (global-eldoc-mode))
 (use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
 
-
-
-
-
 (provide 'init)
 ;;; init.el ends here
-
-;; Local Variables:
-;; byte-compile-warnings: (not free-vars noruntime)
-;; End:

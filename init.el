@@ -94,9 +94,10 @@
 
 (defun my/php-mode-hook ()
   "Gets run on php-mode load."
+  (php-eldoc-enable)
   (make-local-variable 'company-backends)
   (add-to-list 'company-backends '(company-phpactor php-extras-company company-dabbrev-code))
-  ;; (flycheck-select-checker 'phpstan)
+  (flycheck-select-checker 'phpstan)
   (setq php-mode-coding-style 'psr2
         c-basic-offset 4)
   (when (eq 0 (buffer-size))
@@ -107,7 +108,7 @@
 (use-package php-extras :defer t :ensure t :after php-mode)
 (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
   :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
-(use-package php-eldoc :defer t :ensure t :after php-mode :init (php-eldoc-enable))
+(use-package php-eldoc :ensure t :after php-mode)
 (use-package flycheck-phpstan :ensure t :after (php-mode flycheck))
 ;; (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
 
@@ -118,7 +119,8 @@
   :after (evil php-mode)
   :config
   (evil-define-key 'normal php-mode-map
-    "gd" #'phpactor-goto-definition))
+    "gd" #'phpactor-goto-definition
+    (kbd "<S-tab>") #'company-phpactor))
 (use-package flycheck-phanclient :disabled :load-path "site-lisp/flycheck-phanclient")
 
 (use-package phpunit :ensure t)
@@ -211,7 +213,7 @@
 (use-package evil-magit :after (evil magit) :ensure t)
 
 ;; Org-Mode
-(use-package dot-org :load-path user-emacs-directory)
+(load-file (concat user-emacs-directory "dot-org.el"))
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))

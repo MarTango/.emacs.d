@@ -13,14 +13,14 @@
    ("C-'" . org-cycle-agenda-files))
   :init
   (setq org-directory "~/gtd"
-        org-capture-templates '(("a" "Add to inbox" entry (file+headline "~/gtd/inbox.org" "INBOX")
+        org-capture-templates '(("a" "Add to inbox" entry (file "~/gtd/inbox.org")
                                  "* TODO %?
 :PROPERTIES:
 :CREATED: %U
 :END:")
-                                ("p" "Protocol" entry (file+headline "~/gtd/inbox.org" "INBOX")
+                                ("p" "Protocol" entry (file "~/gtd/inbox.org")
                                  "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-                                ("L" "Protocol Link" entry (file+headline "~/gtd/inbox.org" "INBOX")
+                                ("L" "Protocol Link" entry (file "~/gtd/inbox.org")
                                  "* %? [[%:link][%:description]] \nCaptured On: %U"))
         org-refile-targets '(("~/gtd/todo.org" :maxlevel . 3)
                              ("~/gtd/tickler.org" :maxlevel . 2))
@@ -35,11 +35,9 @@
 
 (use-package server
   :no-require
-  :hook (server-switch . (lambda () (select-frame-set-input-focus (selected-frame))))
   :hook (after-init . server-start))
 
 (use-package org-protocol)
 
 (provide 'dot-org)
-
 ;;; dot-org ends here

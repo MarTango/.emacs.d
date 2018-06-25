@@ -54,7 +54,6 @@
   :bind
   (("C-:" . avy-goto-char)))
 
-
 (use-package async :ensure t
   :config
   (setq async-bytecomp-allowed-packages '(all))
@@ -241,6 +240,7 @@
   (mu4e-change-filenames-when-moving t)
   (mu4e-update-interval 180)
   (mu4e-view-show-images t)
+  (mu4e-compose-signature "Martin")
   :config
   (setenv "GPG_AGENT_INFO" "~/.gnupg/S.gpg-agent:2300:1"))
 

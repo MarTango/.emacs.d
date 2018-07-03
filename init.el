@@ -110,7 +110,7 @@
   "Gets run on php-mode load."
   (php-eldoc-enable)
   (make-local-variable 'company-backends)
-  (add-to-list 'company-backends '(company-phpactor php-extras-company company-dabbrev-code))
+  (setq company-backends '(company-phpactor php-extras-company company-dabbrev-code))
   (flycheck-select-checker 'phpstan)
   (setq php-mode-coding-style 'psr2
         c-basic-offset 4)

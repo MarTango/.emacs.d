@@ -16,7 +16,6 @@
    ("C-c C-x" . org-clock-goto)
    ("C-'" . org-cycle-agenda-files))
   :custom
-  (org-refile-use-outline-path 'file)
   (org-directory "~/gtd")
   (org-capture-templates '(("a" "Add to inbox" entry (file "~/gtd/inbox.org")
                             "* TODO %?\n  :PROPERTIES:\n  :CREATED: %U\n  :END:")
@@ -30,6 +29,8 @@
                             "* %? [[%:link][%:description]] \nCaptured On: %U")))
   (org-refile-targets '(("~/gtd/todo.org" :maxlevel . 3)
                         ("~/gtd/tickler.org" :maxlevel . 2)))
+  (org-refile-use-outline-path t)
+  (org-outline-path-complete-in-steps nil)
   (org-agenda-files '("~/gtd/inbox.org" "~/gtd/todo.org" "~/gtd/tickler.org" "~/gtd/notes.org")))
 
 ;; Some require statements to suppress some flycheck warnings - I

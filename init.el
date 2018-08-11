@@ -44,6 +44,8 @@
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
 
+(line-number-mode t)
+
 (use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
 (use-package evil-collection :after evil :ensure t
   :config

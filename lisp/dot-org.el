@@ -31,6 +31,7 @@
                         ("~/gtd/tickler.org" :maxlevel . 2)))
   (org-refile-use-outline-path t)
   (org-outline-path-complete-in-steps nil)
+  (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4))
   (org-agenda-files '("~/gtd/inbox.org" "~/gtd/todo.org" "~/gtd/tickler.org" "~/gtd/notes.org")))
 
 ;; Some require statements to suppress some flycheck warnings - I

@@ -41,10 +41,13 @@
 (require 'evil-org)
 (require 'evil-org-agenda)
 
-(use-package evil-org :ensure t :after (evil org)
+(use-package evil-org
+  :ensure t
+  :after (evil org)
+  :hook
+  (org-mode . evil-org-mode)
+  (evil-org-mode . evil-org-set-key-theme)
   :config
-  (add-hook 'org-mode-hook #'evil-org-mode)
-  (add-hook 'evil-org-mode-hook #'evil-org-set-key-theme)
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 

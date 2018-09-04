@@ -82,13 +82,15 @@
 ;; Theme
 (use-package dracula-theme :ensure t :init (load-theme 'dracula t))
 
-(defun my/frame-behaviours (&optional frame)
-  "Set appearance of FRAME depending on terminal or GUI."
-  (with-selected-frame (or frame (selected-frame))
-    (unless window-system
-      (set-face-background 'default "nil" frame))))
-
-(add-hook 'after-make-frame-functions #'my/frame-behaviours)
+(use-package frame
+  :no-require t
+  :init
+  (defun my/frame-behaviours (&optional frame)
+    "Set appearance of FRAME depending on terminal or GUI."
+    (with-selected-frame (or frame (selected-frame))
+      (unless window-system
+        (set-face-background 'default "nil" frame))))
+  :hook (after-make-frame-functions . my/frame-behaviours))
 
 ;;; Packages
 
@@ -108,19 +110,22 @@
 
 ;; PHP
 
-(defun my/php-mode-hook ()
-  "Gets run on php-mode load."
-  (php-eldoc-enable)
-  (make-local-variable 'company-backends)
-  (setq company-backends '(company-phpactor php-extras-company company-dabbrev-code))
-  (flycheck-select-checker 'phpstan)
-  (setq php-mode-coding-style 'psr2
-        c-basic-offset 4)
-  (when (eq 0 (buffer-size))
-    (insert "<?php\n\n")))
 
 (use-package php-mode :ensure t
-  :init (add-hook 'php-mode-hook #'my/php-mode-hook))
+  :init
+  (defun my/php-mode-hook ()
+    "Gets run on php-mode load."
+    (php-eldoc-enable)
+    (make-local-variable 'company-backends)
+    (setq company-backends '(company-phpactor php-extras-company company-dabbrev-code))
+    (flycheck-select-checker 'phpstan)
+    (setq php-mode-coding-style 'psr2
+          c-basic-offset 4)
+    (when (eq 0 (buffer-size))
+      (insert "<?php\n\n")))
+  :hook
+  (php-mode . my/php-mode-hook))
+
 (use-package php-extras :defer t :ensure t :after php-mode)
 (use-package php-auto-yasnippets :defer t :ensure t :after php-mode
   :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
@@ -177,52 +182,53 @@
 
 ;; JavaScript
 
-(defun my/js2-mode-hook ()
-  "My javascript mode hook."
-  (setq js2-basic-offset 2)
-  (tern-mode t)
-  (js2-refactor-mode)
-  (add-to-list (make-local-variable 'company-backends) 'company-tern))
-
 (use-package js2-mode
   :ensure t
   :mode "\\.js\\'"
   :interpreter ("node" . js2-mode)
-  :init
-  (add-hook 'js2-mode-hook #'my/js2-mode-hook))
+  :custom (js2-basic-offset 2))
 
-(use-package tern
+(use-package tide
   :ensure t
-  :defer t
-  :config
-  (evil-define-key 'normal tern-mode-keymap
-    "gd" #'tern-find-definition
-    (kbd "C-t") #'tern-pop-find-definition))
+  :after (company flycheck)
+  :custom
+  (company-tooltip-align-annotations t)
+  (flycheck-check-syntax-automatically '(save mode-enabled))
+  (tide-format-options '(:indentSize 2 :insertSpaceAfterFunctionKeywordForAnonymousFunctions t))
+  :hook
+  ((js2-mode . tide-setup)
+   (before-save . tide-format-before-save)
+   (js2-mode . tide-hl-identifier-mode)))
 
-(use-package company-tern :ensure t :after tern)
-(use-package js2-refactor :ensure t :after js2-mode
-  :config (js2r-add-keybindings-with-prefix "C-c C-m"))
-
+(use-package js2-refactor
+  :ensure t
+  :after js2-mode
+  :hook (js2-mode . js2-refactor-mode)
+  :config (js2r-add-keybindings-with-prefix "C-c RET"))
 
 ;; Python
 
-(defun my/python-mode-hook ()
-  "My python mode hook."
-  (anaconda-mode)
-  (anaconda-eldoc-mode)
-  (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
+(use-package anaconda-mode
+  :defer t
+  :ensure t
+  :init
+  (defun my/python-mode-hook ()
+    "My python mode hook."
+    (anaconda-mode)
+    (anaconda-eldoc-mode)
+    (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
+  (add-hook 'python-mode-hook #'my/python-mode-hook)
+  (use-package company-anaconda :defer t :ensure t :after (company anaconda))
+  :custom
+  (python-shell-interpreter "python3"))
 
-(use-package anaconda-mode :defer t :ensure t :init (add-hook 'python-mode-hook #'my/python-mode-hook))
-(use-package company-anaconda :defer t :ensure t :after (company anaconda))
-
-;; Languages I don't use.
-
-(use-package ess :disabled :defer t)
+;; Languages I don't (but would like to) use.
+(use-package ess :disabled :defer t) ;; R, julia, stats stuff
 (use-package octave-mode :disabled :defer t :mode "\\.m\\'")
 
 ;; Other Modes
 
-(use-package json-mode :ensure t :defer t :init (add-hook 'json-mode-hook (lambda () (setq js-indent-level 2))))
+(use-package json-mode :ensure t :defer t :custom (js-indent-level 2))
 (use-package csv-mode :ensure t :defer t)
 (use-package markdown-mode :ensure t :defer t)
 (use-package yaml-mode :ensure t :defer t)

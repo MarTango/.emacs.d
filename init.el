@@ -198,7 +198,8 @@
   :hook
   ((js2-mode . tide-setup)
    (before-save . tide-format-before-save)
-   (js2-mode . tide-hl-identifier-mode)))
+   (js2-mode . tide-hl-identifier-mode)
+   (typescript-mode . tide-setup)))
 
 (use-package js2-refactor
   :ensure t

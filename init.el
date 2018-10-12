@@ -52,9 +52,7 @@
   (evil-collection-init))
 (use-package evil-magit :after (evil magit) :ensure t)
 
-(use-package avy
-  :bind
-  (("C-:" . avy-goto-char)))
+(use-package avy :bind (("C-:" . avy-goto-char)))
 
 (use-package async :ensure t
   :config
@@ -97,46 +95,60 @@
 ;; HTML
 
 (use-package web-mode :ensure t :defer t
-  :config
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-markup-indent-offset 2)
-  (defvar css-indent-offset 2)
+  :custom
+  (web-mode-code-indent-offset 2)
+  (web-mode-markup-indent-offset 2)
+  (css-indent-offset 2)
   :mode "\\.html?\\'")
 
 (use-package emmet-mode :ensure t :defer t :init
-  (add-hook 'web-mode-hook #'emmet-mode)
-  (add-hook 'sgml-mode-hook #'emmet-mode)
-  (add-hook 'css-mode-hook #'emmet-mode))
+  :hook
+  (web-mode . emmet-mode)
+  (sgml-mode . emmet-mode)
+  (css-mode . emmet-mode))
 
 ;; PHP
 
-
 (use-package php-mode :ensure t
+  :after flycheck
   :init
   (defun my/php-mode-hook ()
     "Gets run on php-mode load."
     (php-eldoc-enable)
-    (make-local-variable 'company-backends)
-    (setq company-backends '(company-phpactor php-extras-company company-dabbrev-code))
-    (flycheck-select-checker 'phpstan)
-    (setq php-mode-coding-style 'psr2
-          c-basic-offset 4)
+    (mapc #'flycheck-select-checker '(phpstan php php-phpcs))
+
+    (setq (make-local-variable 'company-backends)
+          '(company-phpactor
+            php-extras-company
+            company-dabbrev-code
+            company-files))
+
     (when (eq 0 (buffer-size))
       (insert "<?php\n\n")))
   :hook
-  (php-mode . my/php-mode-hook))
+  (php-mode . my/php-mode-hook)
+  :custom
+  (php-mode-coding-style 'psr2)
+  (c-basic-offset 4))
 
 (use-package php-extras :defer t :ensure t :after php-mode)
-(use-package php-auto-yasnippets :defer t :ensure t :after php-mode
-  :bind (:map php-mode-map ("C-c C-y" . yas/create-php-snippet)))
+
+(use-package php-auto-yasnippets
+  :defer t
+  :ensure t
+  :after php-mode
+  :bind
+  (:map php-mode-map
+        ("C-c C-y" . yas/create-php-snippet)))
+
 (use-package php-eldoc :ensure t :after php-mode)
+
 (use-package flycheck-phpstan :ensure t :after (php-mode flycheck))
-;; (use-package ggtags :defer t :ensure t :init (add-hook 'php-mode-hook #'ggtags-mode))
+
 (use-package psysh :ensure t :after php-mode
   :config
   (evil-define-key '(normal insert) php-mode-map
-    (kbd "C-c C-z") 'psysh)
-  )
+    (kbd "C-c C-z") 'psysh))
 
 (use-package php-refactor-mode :load-path "site-lisp/" :defer t
   :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
@@ -157,24 +169,25 @@
 (use-package fluca-php :load-path "site-lisp/")
 
 (defun geben-php-run ()
-  "Start the geben listener, then run the current script with xdebug configuration to point to geben listener."
+  "Start the geben listener, then run the current script.
+PHP is run with xdebug INI entries to point to geben listener."
   (interactive)
   (call-interactively #'geben)
-  (let ((cmd (list "php" "-d"
-                   "xdebug.remote_enable=on" "-d"
-                   "xdebug.remote_host=127.0.0.1" "-d"
-                   "xdebug.remote_port=9000" "-d"
-                   "xdebug.remote_handler=dbgp" "-d"
-                   "xdebug.idekey=geben" "-d"
-                   "xdebug.remote_autostart=On"
-                   (buffer-file-name))))
+  (let ((cmd (list "php"
+               "-d" "xdebug.remote_enable=on"
+               "-d" "xdebug.remote_host=127.0.0.1"
+               "-d" "xdebug.remote_port=9000"
+               "-d" "xdebug.remote_handler=dbgp"
+               "-d" "xdebug.idekey=geben"
+               "-d" "xdebug.remote_autostart=on"
+               (buffer-file-name))))
     (apply #'start-process  "GebenPHPDebug" "*geben*" cmd)))
 
 (use-package geben
   :ensure t
   :after evil
-  :init
-  (add-hook 'geben-mode-hook #'evil-emacs-state)
+  :hook
+  (geben-mode . evil-emacs-state)
   :config
   (evil-define-key 'normal php-mode-map
     (kbd "C-c C-d") #'geben-php-run))
@@ -194,18 +207,17 @@
   :custom
   (company-tooltip-align-annotations t)
   (flycheck-check-syntax-automatically '(save mode-enabled))
-  (tide-format-options '(:indentSize 2 :insertSpaceAfterFunctionKeywordForAnonymousFunctions t))
+  (tide-format-options
+   (list :indentSize 2
+         :insertSpaceAfterFunctionKeywordForAnonymousFunctions t))
+  :bind (:map tide-mode-map
+              ("C-c C-r" . tide-rename-symbol)
+              ("C-c r" . tide-refactor))
   :hook
-  ((js2-mode . tide-setup)
-   (before-save . tide-format-before-save)
-   (js2-mode . tide-hl-identifier-mode)
-   (typescript-mode . tide-setup)))
-
-(use-package js2-refactor
-  :ensure t
-  :after js2-mode
-  :hook (js2-mode . js2-refactor-mode)
-  :config (js2r-add-keybindings-with-prefix "C-c RET"))
+  (js2-mode . tide-setup)
+  (before-save . tide-format-before-save)
+  (js2-mode . tide-hl-identifier-mode)
+  (typescript-mode . tide-setup))
 
 ;; Python
 
@@ -218,14 +230,16 @@
     (anaconda-mode)
     (anaconda-eldoc-mode)
     (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
-  (add-hook 'python-mode-hook #'my/python-mode-hook)
   (use-package company-anaconda :defer t :ensure t :after (company anaconda))
+  :hook
+  (python-mode . my/python-mode-hook)
   :custom
   (python-shell-interpreter "python3"))
 
-;; Languages I don't (but would like to) use.
-(use-package ess :disabled :defer t) ;; R, julia, stats stuff
-(use-package octave-mode :disabled :defer t :mode "\\.m\\'")
+(use-package pipenv
+  :defer t
+  :ensure t
+  :hook (python-mode . pipenv-mode))
 
 ;; Other Modes
 
@@ -269,11 +283,13 @@
 
 (use-package mu4e-alert
   :ensure t
-  :hook (after-init . mu4e-alert-enable-mode-line-display))
+  :hook
+  (after-init . mu4e-alert-enable-mode-line-display))
 
 (use-package org-mu4e
   :load-path my/mu4e-load-path
-  :custom (org-mu4e-convert-to-html t))
+  :custom
+  (org-mu4e-convert-to-html t))
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
@@ -291,13 +307,16 @@
   (ivy-mode 1)
   :config
   (global-set-key (kbd "C-s") 'swiper)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (setq magit-completing-read-function 'ivy-completing-read))
+  :custom
+  (magit-completing-read-function 'ivy-completing-read)
+  :bind
+  ("C-s" . swiper)
+  ("M-x" . counsel-M-x)
+  ("C-x C-f" . counsel-find-file)
+  ("<f1> f" . counsel-describe-function)
+  ("<f1> v" . counsel-describe-variable)
+  ("<f1> l" . counsel-find-library)
+  ("<f2> i" . counsel-info-lookup-symbol))
 
 (use-package ivy-hydra :defer t)
 

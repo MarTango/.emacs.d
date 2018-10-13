@@ -110,7 +110,7 @@
 ;; PHP
 
 (use-package php-mode :ensure t
-  :after flycheck
+  :after (flycheck company)
   :init
   (defun my/php-mode-hook ()
     "Gets run on php-mode load."
@@ -203,7 +203,7 @@ PHP is run with xdebug INI entries to point to geben listener."
 
 (use-package tide
   :ensure t
-  :after (company flycheck)
+  :after (flycheck)
   :custom
   (company-tooltip-align-annotations t)
   (flycheck-check-syntax-automatically '(save mode-enabled))
@@ -240,6 +240,11 @@ PHP is run with xdebug INI entries to point to geben listener."
   :defer t
   :ensure t
   :hook (python-mode . pipenv-mode))
+
+(use-package blacken
+  :defer t
+  :ensure t
+  :hook (python-mode . blacken-mode))
 
 ;; Other Modes
 
@@ -295,10 +300,14 @@ PHP is run with xdebug INI entries to point to geben listener."
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
 (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
-(use-package company :ensure t :config
+
+(use-package company
+  :ensure t
+  :config
   (global-company-mode)
   (setq company-dabbrev-downcase nil
         company-dabbrev-ignore-case nil))
+
 (use-package which-key :ensure t :init (which-key-mode 1))
 
 (use-package counsel

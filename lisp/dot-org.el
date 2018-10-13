@@ -37,9 +37,9 @@
 ;; Some require statements to suppress some flycheck warnings - I
 ;; mean to prevent byte-compilation errors.
 
-(require 'advice)
-(require 'evil-org)
-(require 'evil-org-agenda)
+;; (require 'advice)
+;;(require 'evil-org)
+;; (require 'evil-org-agenda)
 
 (use-package evil-org
   :ensure t

@@ -26,8 +26,8 @@
 ;;; Code:
 
 (require 'package)
-(setq package-enable-at-startup nil)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+(setq package-enable-at-startup nil
+      package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")))
@@ -41,8 +41,9 @@
 (require 'bind-key)
 
 ;; Keybindings
-(add-to-list 'load-path (concat user-emacs-directory "lisp"))
-(add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
+(mapc (lambda (folder)
+        (add-to-list 'load-path (concat user-emacs-directory folder)))
+      '("lisp" "site-lisp"))
 
 (line-number-mode t)
 

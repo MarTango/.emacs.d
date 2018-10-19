@@ -47,7 +47,13 @@
 
 (line-number-mode t)
 
-(use-package evil :ensure t :init (setq evil-want-integration nil) (evil-mode))
+(use-package evil :ensure t
+  :custom
+  (evil-want-integration nil)
+  (evil-want-keybinding nil)
+  :init
+  (evil-mode))
+
 (use-package evil-collection :after evil :ensure t
   :config
   (evil-collection-init))
@@ -102,7 +108,9 @@
   (css-indent-offset 2)
   :mode "\\.html?\\'")
 
-(use-package emmet-mode :ensure t :defer t :init
+(use-package emmet-mode
+  :ensure t
+  :defer t
   :hook
   (web-mode . emmet-mode)
   (sgml-mode . emmet-mode)
@@ -110,7 +118,8 @@
 
 ;; PHP
 
-(use-package php-mode :ensure t
+(use-package php-mode
+  :ensure t
   :after (flycheck company)
   :init
   (defun my/php-mode-hook ()
@@ -118,7 +127,7 @@
     (php-eldoc-enable)
     (mapc #'flycheck-select-checker '(phpstan php php-phpcs))
 
-    (setq (make-local-variable 'company-backends)
+    (set (make-local-variable 'company-backends)
           '(company-phpactor
             php-extras-company
             company-dabbrev-code
@@ -275,8 +284,6 @@ PHP is run with xdebug INI entries to point to geben listener."
   :ensure t
   :init
   (ivy-mode 1)
-  :config
-  (global-set-key (kbd "C-s") 'swiper)
   :custom
   (magit-completing-read-function 'ivy-completing-read)
   :bind
@@ -286,7 +293,7 @@ PHP is run with xdebug INI entries to point to geben listener."
   ("<f1> f" . counsel-describe-function)
   ("<f1> v" . counsel-describe-variable)
   ("<f1> l" . counsel-find-library)
-  ("<f2> i" . counsel-info-lookup-symbol))
+  ("C-h i" . counsel-info-lookup-symbol))
 
 (use-package ivy-hydra :defer t)
 
@@ -295,7 +302,12 @@ PHP is run with xdebug INI entries to point to geben listener."
   :config (setq flycheck-phpcs-standard "PSR2"))
 (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
 (use-package eldoc :config (global-eldoc-mode))
-(use-package ace-window :ensure t :defer t :commands (ace-window) :init (global-set-key (kbd "M-i") 'ace-window))
+(use-package ace-window
+  :ensure t
+  :defer t
+  :commands (ace-window)
+  :bind
+  ("M-i" . 'ace-window))
 
 (provide 'init)
 ;;; init.el ends here

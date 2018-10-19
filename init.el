@@ -235,12 +235,17 @@ PHP is run with xdebug INI entries to point to geben listener."
          :insertSpaceAfterFunctionKeywordForAnonymousFunctions t))
   :bind (:map tide-mode-map
               ("C-c C-r" . tide-rename-symbol)
-              ("C-c r" . tide-refactor))
+              ("C-c r" . tide-refactor)
+              ("C-M-i" . company-complete))
+  :init
+  (defun my/tide-hook ()
+    (tide-setup)
+    (tide-hl-identifier-mode)
+    (set (make-local-variable 'company-backends)
+         '(company-tide company-files)))
   :hook
-  (js2-mode . tide-setup)
-  (before-save . tide-format-before-save)
-  (js2-mode . tide-hl-identifier-mode)
-  (typescript-mode . tide-setup))
+  (js2-mode . my/tide-hook)
+  (typescript-mode . my/tide-hook))
 
 ;; Python
 

@@ -257,46 +257,6 @@ PHP is run with xdebug INI entries to point to geben listener."
 ;; Org-Mode
 (use-package dot-org)
 
-;; Mu4e
-(defvar my/mu4e-load-path "/usr/local/share/emacs/site-lisp/mu/mu4e"
-  "Directory containing mu4e emacs-lisp files.")
-(use-package mu4e
-  :load-path my/mu4e-load-path
-  :custom
-  (mu4e-maildir "~/.email/work")
-  (mu4e-sent-folder "/Sent")
-  (mu4e-trash-folder "/Trash")
-  (mu4e-drafts-folder "/drafts")
-  (mu4e-get-mail-command "mbsync -a")
-  (mu4e-change-filenames-when-moving t)
-  (mu4e-update-interval 180)
-  (mu4e-view-show-images t)
-  (mu4e-compose-signature "Martin")
-  :config
-  (setenv "GPG_AGENT_INFO" "~/.gnupg/S.gpg-agent:2300:1"))
-
-(use-package smtpmail
-  :custom
-  (user-mail-address "martin@brainlabsdigital.com")
-  (user-full-name "Martin Tang")
-  (message-send-mail-function 'smtpmail-send-it)
-  (starttls-use-gnutls t)
-  (smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil)))
-  (smtpmail-auth-credentials '(("smtp.gmail.com" 587 "martin@brainlabsdigital.com" nil)))
-  (smtpmail-default-smtp-server "smtp.gmail.com")
-  (smtpmail-smtp-service 587)
-  (message-kill-buffer-on-exit t))
-
-(use-package mu4e-alert
-  :ensure t
-  :hook
-  (after-init . mu4e-alert-enable-mode-line-display))
-
-(use-package org-mu4e
-  :load-path my/mu4e-load-path
-  :custom
-  (org-mu4e-convert-to-html t))
-
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
 (use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))

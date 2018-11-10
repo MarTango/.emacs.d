@@ -303,10 +303,13 @@ PHP is run with xdebug INI entries to point to geben listener."
 
 (use-package company
   :ensure t
+  :custom
+  (company-dabbrev-downcase nil)
+  (company-dabbrev-ignore-case nil)
   :config
   (global-company-mode)
-  (setq company-dabbrev-downcase nil
-        company-dabbrev-ignore-case nil))
+  (evil-define-key 'insert 'global-map
+    (kbd "C-SPC") #'company-complete))
 
 (use-package which-key :ensure t :init (which-key-mode 1))
 

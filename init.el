@@ -47,6 +47,8 @@
 
 (line-number-mode t)
 
+;; EViL
+
 (use-package evil :ensure t
   :custom
   (evil-want-integration nil)
@@ -57,9 +59,10 @@
 (use-package evil-collection :after evil :ensure t
   :config
   (evil-collection-init))
-(use-package evil-magit :after (evil magit) :ensure t)
 
-(use-package avy :bind (("C-:" . avy-goto-char)))
+(use-package evil-magit
+  :after (evil magit)
+  :ensure t)
 
 (use-package async :ensure t
   :config
@@ -228,6 +231,7 @@ PHP is run with xdebug INI entries to point to geben listener."
   :ensure t
   :after (flycheck)
   :custom
+  (typescript-indent-level 2)
   (company-tooltip-align-annotations t)
   (flycheck-check-syntax-automatically '(save mode-enabled))
   (tide-format-options
@@ -262,7 +266,15 @@ PHP is run with xdebug INI entries to point to geben listener."
   :hook
   (python-mode . my/python-mode-hook)
   :custom
-  (python-shell-interpreter "python3"))
+  (python-shell-interpreter
+   (if (string-equal "windows-nt" system-type)
+       "python"
+     "python3")))
+
+(use-package blacken
+  :ensure t
+  :after python
+  :hook (python-mode . blacken-mode))
 
 (use-package pipenv
   :defer t

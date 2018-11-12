@@ -76,7 +76,9 @@
   (setf epa-pinentry-mode 'loopback))
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
-(load custom-file)
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
 (setq inhibit-startup-screen t)
 (setq-default indent-tabs-mode nil)
@@ -101,6 +103,10 @@
   :hook (after-make-frame-functions . my/frame-behaviours))
 
 ;;; Packages
+
+;; Emacs-Lisp
+(use-package nameless
+  :ensure t)
 
 ;; HTML
 
@@ -128,8 +134,6 @@
   (defun my/php-mode-hook ()
     "Gets run on php-mode load."
     (php-eldoc-enable)
-    (mapc #'flycheck-select-checker '(phpstan php php-phpcs))
-
     (set (make-local-variable 'company-backends)
           '(company-phpactor
             php-extras-company
@@ -137,7 +141,9 @@
             company-files))
 
     (when (eq 0 (buffer-size))
-      (insert "<?php\n\n")))
+      (insert "<?php\n\n"))
+    (flycheck-add-next-checker 'php 'phpstan)
+    (flycheck-add-next-checker 'phpstan 'php-phpcs))
   :hook
   (php-mode . my/php-mode-hook)
   :custom
@@ -200,7 +206,7 @@ PHP is run with xdebug INI entries to point to geben listener."
   :ensure t
   :after evil
   :hook
-  (geben-mode . evil-emacs-state)
+  (add-to-list 'evil-emacs-state-modes 'geben-mode)
   :config
   (evil-define-key 'normal php-mode-map
     (kbd "C-c C-d") #'geben-php-run))
@@ -261,7 +267,8 @@ PHP is run with xdebug INI entries to point to geben listener."
     "My python mode hook."
     (anaconda-mode)
     (anaconda-eldoc-mode)
-    (add-to-list (make-local-variable 'company-backends) 'company-anaconda))
+    (add-to-list (make-local-variable 'company-backends) 'company-anaconda)
+    (mapc #'flycheck-select-checker '(python-mypy)))
   (use-package company-anaconda :defer t :ensure t :after (company anaconda))
   :hook
   (python-mode . my/python-mode-hook)

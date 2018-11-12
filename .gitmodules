@@ -1,5 +1,5 @@
-[submodule ".\\site-lisp\\phpactor.el"]
-	path = .\\site-lisp\\phpactor.el
+[submodule "site-lisp/phpactor.el"]
+	path = site-lisp/phpactor.el
 	url = https://github.com/martango/phpactor.el
 [submodule "site-lisp/flycheck-phanclient"]
 	path = site-lisp/flycheck-phanclient

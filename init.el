@@ -31,7 +31,8 @@
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")))
-(package-initialize)
+(when (version< emacs-version "27")
+  (package-initialize))
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -172,6 +173,8 @@
 (use-package php-refactor-mode :load-path "site-lisp/" :defer t
   :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
 (use-package company-phpactor :load-path "site-lisp/phpactor.el")
+
+
 (use-package phpactor :load-path "site-lisp/phpactor.el"
   :after (evil php-mode)
   :config
@@ -180,6 +183,8 @@
     (kbd "<M-tab>") #'company-phpactor)
   (evil-define-key 'insert php-mode-map
     (kbd "<M-tab>") #'company-phpactor))
+
+
 (use-package flycheck-phanclient :disabled :load-path "site-lisp/flycheck-phanclient")
 
 (use-package phpunit :ensure t)

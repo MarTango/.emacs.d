@@ -42,9 +42,8 @@
 (require 'bind-key)
 
 ;; Keybindings
-(mapc (lambda (folder)
+(dolist (folder '("lisp" "site-lisp"))
         (add-to-list 'load-path (concat user-emacs-directory folder)))
-      '("lisp" "site-lisp"))
 
 (line-number-mode t)
 
@@ -52,7 +51,7 @@
 
 (use-package evil :ensure t
   :custom
-  (evil-want-integration nil)
+  (evil-want-integration t)
   (evil-want-keybinding nil)
   :init
   (evil-mode))
@@ -87,6 +86,7 @@
 (global-set-key (kbd "<s-up>") 'toggle-frame-fullscreen)
 (show-paren-mode)
 (menu-bar-mode -1)
+(tool-bar-mode -1)
 
 ;;; Appearance
 
@@ -273,15 +273,15 @@ PHP is run with xdebug INI entries to point to geben listener."
     (anaconda-mode)
     (anaconda-eldoc-mode)
     (add-to-list (make-local-variable 'company-backends) 'company-anaconda)
-    (mapc #'flycheck-select-checker '(python-mypy)))
+    ;; (mapc #'flycheck-select-checker '(python-mypy))
+    )
   (use-package company-anaconda :defer t :ensure t :after (company anaconda))
   :hook
   (python-mode . my/python-mode-hook)
   :custom
-  (python-shell-interpreter
-   (if (string-equal "windows-nt" system-type)
-       "python"
-     "python3")))
+  (python-shell-interpreter (if (string-equal "windows-nt" system-type)
+                                "python"
+                              "python3")))
 
 (use-package blacken
   :ensure t

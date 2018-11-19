@@ -271,36 +271,31 @@ PHP is run with xdebug INI entries to point to geben listener."
 (use-package anaconda-mode
   :defer t
   :ensure t
-  :init
-  (defun my/python-mode-hook ()
-    "My python mode hook."
-    (anaconda-mode)
-    (anaconda-eldoc-mode)
-    (add-to-list (make-local-variable 'company-backends) 'company-anaconda)
-    ;; (mapc #'flycheck-select-checker '(python-mypy))
-    )
-  (use-package company-anaconda :defer t :ensure t :after (company anaconda))
   :hook
-  (python-mode . my/python-mode-hook)
+  (python-mode . anaconda-mode)
+  (python-mode . anaconda-eldoc-mode)
+  (python-mode . (lambda ()
+                   (add-to-list 'company-backends 'company-anaconda)
+                   (flycheck-select-checker 'python-mypy)))
+  :init
+  (use-package company-anaconda :defer t :ensure t :after (company anaconda))
   :custom
   (python-shell-interpreter (if (string-equal "windows-nt" system-type)
-                                "python"
-                              "python3")))
+                                "python" "python3")))
 
 (use-package blacken
   :ensure t
   :after python
-  :hook (python-mode . blacken-mode))
+  :hook
+  (python-mode . (lambda ()
+                   (when (executable-find blacken-executable)
+                     (blacken-mode)))))
 
 (use-package pipenv
   :defer t
   :ensure t
-  :hook (python-mode . pipenv-mode))
-
-(use-package blacken
-  :defer t
-  :ensure t
-  :hook (python-mode . blacken-mode))
+  :hook
+  (python-mode . pipenv-mode))
 
 ;; Other Modes
 

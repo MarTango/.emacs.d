@@ -175,15 +175,16 @@
 
 (use-package php-refactor-mode :load-path "site-lisp/" :defer t
   :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
-(use-package company-phpactor :load-path "site-lisp/phpactor.el")
+(use-package company-phpactor
+  :after company
+  :load-path "site-lisp/phpactor.el")
 
 
 (use-package phpactor :load-path "site-lisp/phpactor.el"
   :after (evil php-mode)
   :config
   (evil-define-key 'normal php-mode-map
-    "gd" #'phpactor-goto-definition
-    (kbd "<M-tab>") #'company-phpactor)
+    "gd" #'phpactor-goto-definition)
   (evil-define-key 'insert php-mode-map
     (kbd "<M-tab>") #'company-phpactor))
 

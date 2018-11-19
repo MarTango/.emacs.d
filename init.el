@@ -70,10 +70,10 @@
   (async-bytecomp-package-mode 1))
 
 ;; For GPG passphrase stuff
-(defvar epa-pinentry-mode)
+(defvar epg-pinentry-mode)
 (if (string= system-type "windows-nt")
-    (setf epa-pinentry-mode 'nil)
-  (setf epa-pinentry-mode 'loopback))
+    (setf epg-pinentry-mode 'nil)
+  (setf epg-pinentry-mode 'loopback))
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)

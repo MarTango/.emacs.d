@@ -163,7 +163,10 @@
 
 (use-package php-eldoc :ensure t :after php-mode)
 
-(use-package flycheck-phpstan :ensure t :after (php-mode flycheck))
+(use-package flycheck-phpstan
+  :ensure t
+  :after (php-mode flycheck)
+  :custom (phpstan-level 4))
 
 (use-package psysh :ensure t :after php-mode
   :config

@@ -70,10 +70,10 @@
   (async-bytecomp-package-mode 1))
 
 ;; For GPG passphrase stuff
-(defvar epa-pinentry-mode)
+(defvar epg-pinentry-mode)
 (if (string= system-type "windows-nt")
-    (setf epa-pinentry-mode 'nil)
-  (setf epa-pinentry-mode 'loopback))
+    (setf epg-pinentry-mode 'nil)
+  (setf epg-pinentry-mode 'loopback))
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
@@ -176,7 +176,9 @@
 
 (use-package php-refactor-mode :load-path "site-lisp/" :defer t
   :commands php-refactor-mode :init (add-hook 'php-mode-hook #'php-refactor-mode))
-(use-package company-phpactor :load-path "site-lisp/phpactor.el")
+(use-package company-phpactor
+  :after company
+  :load-path "site-lisp/phpactor.el")
 
 
 (use-package phpactor :load-path "site-lisp/phpactor.el"
@@ -185,8 +187,7 @@
   (phpactor-executable (executable-find "phpactor"))
   :config
   (evil-define-key 'normal php-mode-map
-    "gd" #'phpactor-goto-definition
-    (kbd "<M-tab>") #'company-phpactor)
+    "gd" #'phpactor-goto-definition)
   (evil-define-key 'insert php-mode-map
     (kbd "<M-tab>") #'company-phpactor))
 
@@ -273,32 +274,22 @@ PHP is run with xdebug INI entries to point to geben listener."
 (use-package anaconda-mode
   :defer t
   :ensure t
+  :hook
+  (python-mode . anaconda-mode)
+  (python-mode . anaconda-eldoc-mode)
+  (python-mode . (lambda ()
+                   (add-to-list 'company-backends 'company-anaconda)
+                   (flycheck-select-checker 'python-mypy)))
   :init
-  (defun my/python-mode-hook ()
-    "My python mode hook."
-    (anaconda-mode)
-    (anaconda-eldoc-mode)
-    (add-to-list (make-local-variable 'company-backends) 'company-anaconda)
-    ;; (mapc #'flycheck-select-checker '(python-mypy))
-    )
   (use-package company-anaconda :defer t :ensure t :after (company anaconda))
   :hook
   (python-mode . my/python-mode-hook))
 
-(use-package blacken
-  :ensure t
-  :after python
-  :hook (python-mode . blacken-mode))
-
 (use-package pipenv
   :defer t
   :ensure t
-  :hook (python-mode . pipenv-mode))
-
-(use-package blacken
-  :defer t
-  :ensure t
-  :hook (python-mode . blacken-mode))
+  :hook
+  (python-mode . pipenv-mode))
 
 ;; Other Modes
 

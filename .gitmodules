@@ -4,3 +4,6 @@
 [submodule "site-lisp/flycheck-phanclient"]
 	path = site-lisp/flycheck-phanclient
 	url = https://github.com/martango/flycheck-phanclient
+[submodule "site-lisp/phpstan.el"]
+	path = site-lisp/phpstan.el
+	url = https://github.com/emacs-php/phpstan.el

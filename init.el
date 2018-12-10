@@ -164,7 +164,8 @@
 (use-package php-eldoc :ensure t :after php-mode)
 
 (use-package flycheck-phpstan
-  :ensure t
+  ;; :ensure t
+  :load-path "site-lisp/phpstan.el"
   :after (php-mode flycheck)
   :custom (phpstan-level 4))
 
@@ -180,6 +181,8 @@
 
 (use-package phpactor :load-path "site-lisp/phpactor.el"
   :after (evil php-mode)
+  :custom
+  (phpactor-executable (executable-find "phpactor"))
   :config
   (evil-define-key 'normal php-mode-map
     "gd" #'phpactor-goto-definition
@@ -280,11 +283,7 @@ PHP is run with xdebug INI entries to point to geben listener."
     )
   (use-package company-anaconda :defer t :ensure t :after (company anaconda))
   :hook
-  (python-mode . my/python-mode-hook)
-  :custom
-  (python-shell-interpreter (if (string-equal "windows-nt" system-type)
-                                "python"
-                              "python3")))
+  (python-mode . my/python-mode-hook))
 
 (use-package blacken
   :ensure t

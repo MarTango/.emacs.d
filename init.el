@@ -281,9 +281,7 @@ PHP is run with xdebug INI entries to point to geben listener."
                    (add-to-list 'company-backends 'company-anaconda)
                    (flycheck-select-checker 'python-mypy)))
   :init
-  (use-package company-anaconda :defer t :ensure t :after (company anaconda))
-  :hook
-  (python-mode . my/python-mode-hook))
+  (use-package company-anaconda :defer t :ensure t :after (company anaconda)))
 
 (use-package pipenv
   :defer t

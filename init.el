@@ -258,7 +258,8 @@ PHP is run with xdebug INI entries to point to geben listener."
   :bind (:map tide-mode-map
               ("C-c C-r" . tide-rename-symbol)
               ("C-c r" . tide-refactor)
-              ("C-M-i" . company-complete))
+              ("C-M-i" . company-complete)
+              ("M-r" . tide-references))
   :init
   (defun my/tide-hook ()
     (tide-setup)
@@ -279,15 +280,31 @@ PHP is run with xdebug INI entries to point to geben listener."
   (python-mode . anaconda-eldoc-mode)
   (python-mode . (lambda ()
                    (add-to-list 'company-backends 'company-anaconda)
-                   (flycheck-select-checker 'python-mypy)))
+                   (message (buffer-name))
+                   (when (not (string= " *temp*" (buffer-name)))
+                     (flycheck-select-checker 'python-mypy))))
   :init
   (use-package company-anaconda :defer t :ensure t :after (company anaconda)))
 
 (use-package pipenv
   :defer t
   :ensure t
+  :config
+  (defun pipenv-deactivate-flycheck ()
+    "Deactivate integration of Pipenv with Flycheck."
+    (setq flycheck-executable-find #'flycheck-default-executable-find))
+  (defun pipenv-executable-find (executable)
+    (if (bound-and-true-p python-shell-virtualenv-root)
+        (locate-file executable  (python-shell-calculate-exec-path))
+      (executable-find executable)))
   :hook
   (python-mode . pipenv-mode))
+
+(use-package blacken
+  :defer t
+  :ensure t
+  :hook
+  (python-mode . blacken-mode))
 
 ;; Other Modes
 
@@ -301,7 +318,7 @@ PHP is run with xdebug INI entries to point to geben listener."
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
-(use-package magithub :ensure t :after magit :config (magithub-feature-autoinject t))
+;; (use-package magithub :disabled :ensure t :after magit :config (magithub-feature-autoinject t))
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 
 (use-package company

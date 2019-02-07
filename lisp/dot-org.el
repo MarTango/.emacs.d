@@ -57,5 +57,7 @@
 
 (use-package org-protocol)
 
+(use-package org-tempo)
+
 (provide 'dot-org)
 ;;; dot-org ends here

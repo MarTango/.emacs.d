@@ -91,7 +91,10 @@
 ;;; Appearance
 
 ;; Theme
-(use-package dracula-theme :ensure t :init (load-theme 'dracula t))
+(use-package poet-theme
+  :ensure t
+  :config
+  (load-theme 'poet-dark t))
 
 (use-package frame
   :no-require t
@@ -107,7 +110,8 @@
 
 ;; Emacs-Lisp
 (use-package nameless
-  :ensure t)
+  :ensure t
+  :defer)
 
 ;; HTML
 
@@ -286,6 +290,8 @@ PHP is run with xdebug INI entries to point to geben listener."
   :init
   (use-package company-anaconda :defer t :ensure t :after (company anaconda)))
 
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+
 (use-package pipenv
   :defer t
   :ensure t
@@ -318,6 +324,7 @@ PHP is run with xdebug INI entries to point to geben listener."
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
+(use-package forge :ensure t)
 ;; (use-package magithub :disabled :ensure t :after magit :config (magithub-feature-autoinject t))
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 

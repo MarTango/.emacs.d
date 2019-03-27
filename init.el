@@ -47,6 +47,9 @@
 
 (line-number-mode t)
 
+(setq initial-major-mode 'org-mode)
+(setq initial-scratch-message "")
+
 ;; EViL
 
 (use-package evil :ensure t

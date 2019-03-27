@@ -322,7 +322,11 @@ PHP is run with xdebug INI entries to point to geben listener."
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
-(use-package forge :ensure t)
+(use-package forge
+  :ensure t
+  :config
+  (setq gnutls-log-level 1) ;; See https://github.com/magit/ghub/issues/81
+  )
 ;; (use-package magithub :disabled :ensure t :after magit :config (magithub-feature-autoinject t))
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
 

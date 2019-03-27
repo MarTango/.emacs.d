@@ -90,11 +90,9 @@
 
 ;;; Appearance
 
-;; Theme
-(use-package poet-theme
-  :ensure t
-  :config
-  (load-theme 'poet-dark t))
+(use-package dracula-theme
+  :config (load-theme 'dracula t))
+
 
 (use-package frame
   :no-require t

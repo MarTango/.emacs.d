@@ -192,7 +192,8 @@
   (phpactor-executable (executable-find "phpactor"))
   :config
   (evil-define-key 'normal php-mode-map
-    "gd" #'phpactor-goto-definition)
+    "gd" #'phpactor-goto-definition
+    (kbd "M-r") #'phpactor-find-references)
   (evil-define-key 'insert php-mode-map
     (kbd "<M-tab>") #'company-phpactor))
 

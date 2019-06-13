@@ -338,6 +338,7 @@ PHP is run with xdebug INI entries to point to geben listener."
   :custom
   (company-dabbrev-downcase nil)
   (company-dabbrev-ignore-case nil)
+  :after evil
   :config
   (global-company-mode)
   (evil-define-key 'insert 'global-map

@@ -122,7 +122,9 @@
   (web-mode-code-indent-offset 2)
   (web-mode-markup-indent-offset 2)
   (css-indent-offset 2)
-  :mode "\\.html?\\'")
+  :mode "\\.html?\\'"
+  :mode "\\.tsx\\'"
+  )
 
 (use-package emmet-mode
   :ensure t

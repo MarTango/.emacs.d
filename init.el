@@ -177,9 +177,13 @@
     (tide-hl-identifier-mode)
     (set (make-local-variable 'company-backends)
          '(company-tide company-files)))
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+
   :hook
   (js2-mode . my/tide-hook)
-  (typescript-mode . my/tide-hook))
+  (typescript-mode . my/tide-hook)
+  (web-mode . (lambda () (when (string-equal "tsx" (file-name-extension buffer-file-name)) (my/tide-hook))))
+  )
 
 ;; Python
 

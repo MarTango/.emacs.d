@@ -271,6 +271,16 @@
   ("<f1> l" . counsel-find-library)
   ("C-h i" . counsel-info-lookup-symbol))
 
+(use-package projectile
+  :ensure t
+  :init
+  (bind-key "C-c p" projectile-command-map projectile-mode-map))
+
+(use-package counsel-projectile
+  :after projectile
+  :ensure t
+  :init (counsel-projectile-mode))
+
 (use-package ivy-hydra :defer t)
 
 (use-package docker :ensure t)

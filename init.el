@@ -195,19 +195,10 @@
 
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
-(use-package pipenv
-  :defer t
+(use-package poetry
   :ensure t
-  :config
-  (defun pipenv-deactivate-flycheck ()
-    "Deactivate integration of Pipenv with Flycheck."
-    (setq flycheck-executable-find #'flycheck-default-executable-find))
-  (defun pipenv-executable-find (executable)
-    (if (bound-and-true-p python-shell-virtualenv-root)
-        (locate-file executable  (python-shell-calculate-exec-path))
-      (executable-find executable)))
-  :hook
-  (python-mode . pipenv-mode))
+  :after anaconda
+  :init (poetry-tracking-mode))
 
 (use-package blacken
   :defer t
@@ -286,6 +277,20 @@
   :commands (ace-window)
   :bind
   ("M-i" . 'ace-window))
+
+
+(use-package notmuch
+  :custom (send-mail-function 'mailclient-send-it))
+(use-package org-notmuch :after dot-org notmuch)
+
+
+(use-package ansi-color
+  :init
+  (add-hook
+   'compilation-filter-hook
+   (lambda ()
+     (ansi-color-apply-on-region compilation-filter-start (point)))))
+
 
 (provide 'init)
 ;;; init.el ends here

@@ -56,6 +56,8 @@
   :custom
   (evil-want-integration t)
   (evil-want-keybinding nil)
+  :bind (:map evil-insert-state-map
+              ("C-;" . evil-normal-state))
   :init
   (evil-mode))
 
@@ -73,10 +75,9 @@
   (async-bytecomp-package-mode 1))
 
 ;; For GPG passphrase stuff
+;; `brew install gnupg`
 (defvar epg-pinentry-mode)
-(if (string= system-type "windows-nt")
-    (setf epg-pinentry-mode 'nil)
-  (setf epg-pinentry-mode 'loopback))
+(setf epg-pinentry-mode 'loopback)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
@@ -123,8 +124,7 @@
   (web-mode-markup-indent-offset 2)
   (css-indent-offset 2)
   :mode "\\.html?\\'"
-  :mode "\\.tsx\\'"
-  )
+  :mode "\\.tsx\\'")
 
 (use-package emmet-mode
   :ensure t
@@ -136,22 +136,14 @@
 
 
 ;; JavaScript
+(use-package add-node-modules-path
+  :ensure t
+  :hook
+  js2-mode
+  tide-mode)
 
 (use-package js2-mode
   :ensure t
-  :init
-  (defun my/use-eslint-from-node-modules ()
-    (let* ((root (locate-dominating-file
-                  (or (buffer-file-name) default-directory)
-                  "node_modules"))
-           (eslint (and root
-                        (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                          root))))
-      (when (and eslint (file-executable-p eslint))
-        (setq-local flycheck-javascript-eslint-executable eslint)
-        (flycheck-select-checker 'javascript-eslint))))
-  :hook
-  (js2-mode . my/use-eslint-from-node-modules)
   :mode "\\.js\\'"
   :interpreter ("node" . js2-mode)
   :custom (js2-basic-offset 2))
@@ -164,8 +156,7 @@
   (company-tooltip-align-annotations t)
   (flycheck-check-syntax-automatically '(save mode-enabled))
   (tide-format-options
-   (list :indentSize 2
-         :insertSpaceAfterFunctionKeywordForAnonymousFunctions t))
+   (list :indentSize 2))
   :bind (:map tide-mode-map
               ("C-c C-r" . tide-rename-symbol)
               ("C-c r" . tide-refactor)
@@ -177,13 +168,14 @@
     (tide-hl-identifier-mode)
     (set (make-local-variable 'company-backends)
          '(company-tide company-files)))
+  :config
   (flycheck-add-mode 'typescript-tslint 'web-mode)
-
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
   :hook
   (js2-mode . my/tide-hook)
   (typescript-mode . my/tide-hook)
-  (web-mode . (lambda () (when (string-equal "tsx" (file-name-extension buffer-file-name)) (my/tide-hook))))
-  )
+  (web-mode . (lambda () (when (string-equal "tsx" (file-name-extension buffer-file-name)) (my/tide-hook)))))
 
 ;; Python
 
@@ -237,8 +229,8 @@
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
 (use-package forge
   :ensure t
-  :config
-  (setq gnutls-log-level 1) ;; See https://github.com/magit/ghub/issues/81
+  ;; :config
+  ;; (setq gnutls-log-level 1) ;; See https://github.com/magit/ghub/issues/81
   )
 ;; (use-package magithub :disabled :ensure t :after magit :config (magithub-feature-autoinject t))
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))
@@ -274,7 +266,8 @@
 (use-package projectile
   :ensure t
   :init
-  (bind-key "C-c p" projectile-command-map projectile-mode-map))
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map)))
 
 (use-package counsel-projectile
   :after projectile
@@ -284,8 +277,7 @@
 (use-package ivy-hydra :defer t)
 
 (use-package docker :ensure t)
-(use-package flycheck :ensure t :defer t :init (global-flycheck-mode)
-  :config (setq flycheck-phpcs-standard "PSR2"))
+(use-package flycheck :ensure t :defer t :init (global-flycheck-mode))
 (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
 (use-package eldoc :config (global-eldoc-mode))
 (use-package ace-window

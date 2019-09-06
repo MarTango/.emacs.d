@@ -76,8 +76,8 @@
 
 ;; For GPG passphrase stuff
 ;; `brew install gnupg`
-(defvar epg-pinentry-mode)
-(setf epg-pinentry-mode 'loopback)
+(defvar epa-pinentry-mode)
+(setf epa-pinentry-mode 'loopback)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
@@ -118,13 +118,17 @@
 
 ;; HTML
 
-(use-package web-mode :ensure t :defer t
+(use-package web-mode
+  :ensure t
+  :defer t
   :custom
   (web-mode-code-indent-offset 2)
   (web-mode-markup-indent-offset 2)
+  (web-mode-enable-auto-quoting nil)
   (css-indent-offset 2)
   :mode "\\.html?\\'"
-  :mode "\\.tsx\\'")
+  :mode "\\.tsx\\'"
+  :mode "\\.jsx\\'")
 
 (use-package emmet-mode
   :ensure t
@@ -134,13 +138,19 @@
   (sgml-mode . emmet-mode)
   (css-mode . emmet-mode))
 
-
 ;; JavaScript
 (use-package add-node-modules-path
   :ensure t
   :hook
   js2-mode
-  tide-mode)
+  tide-mode
+  web-mode)
+
+(use-package prettier-js
+  :ensure t
+  :hook
+  js2-mode
+  web-mode)
 
 (use-package js2-mode
   :ensure t
@@ -166,12 +176,15 @@
   (defun my/tide-hook ()
     (tide-setup)
     (tide-hl-identifier-mode)
+    ;; (flycheck-select-checker 'typescript-tslint)
     (set (make-local-variable 'company-backends)
          '(company-tide company-files)))
   :config
   (flycheck-add-mode 'typescript-tslint 'web-mode)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
+  (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint)
+  (flycheck-add-next-checker 'typescript-tslint 'tsx-tide)
   :hook
   (js2-mode . my/tide-hook)
   (typescript-mode . my/tide-hook)
@@ -197,8 +210,8 @@
 
 (use-package poetry
   :ensure t
-  :after anaconda
-  :init (poetry-tracking-mode))
+  :after python
+  :config (poetry-tracking-mode))
 
 (use-package blacken
   :defer t
@@ -212,6 +225,7 @@
 (use-package csv-mode :ensure t :defer t)
 (use-package markdown-mode :ensure t :defer t)
 (use-package yaml-mode :ensure t :defer t)
+(use-package graphql-mode :ensure t :defer t)
 
 ;; Org-Mode
 (use-package dot-org)
@@ -256,7 +270,7 @@
 
 (use-package projectile
   :ensure t
-  :init
+  :init (projectile-mode)
   :bind (:map projectile-mode-map
               ("C-c p" . projectile-command-map)))
 
@@ -290,6 +304,9 @@
    'compilation-filter-hook
    (lambda ()
      (ansi-color-apply-on-region compilation-filter-start (point)))))
+
+
+(use-package pdf-tools) ;; (pdf-tools-install) with env vars set
 
 
 (provide 'init)

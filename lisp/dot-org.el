@@ -16,23 +16,22 @@
    ("C-c C-x" . org-clock-goto)
    ("C-'" . org-cycle-agenda-files))
   :custom
-  (org-directory "~/gtd")
-  (org-capture-templates '(("a" "Add to inbox" entry (file "~/gtd/inbox.org")
+  (org-directory "~/org")
+  (org-capture-templates '(("a" "Add to inbox" entry (file "~/org/inbox.org")
                             "* TODO %?\n  :PROPERTIES:\n  :CREATED: %U\n  :END:")
-                           ("l" "Add to inbox with link" entry (file "~/gtd/inbox.org")
+                           ("l" "Add to inbox with link" entry (file "~/org/inbox.org")
                             "* TODO %?\n  :PROPERTIES:\n  :CREATED: %U\n  :END:\n  %a")
-                           ("n" "Add a note" entry (file "~/gtd/notes.org")
+                           ("n" "Add a note" entry (file "~/org/notes.org")
                             "* %?\n  %a")
-                           ("p" "Protocol" entry (file "~/gtd/inbox.org")
+                           ("p" "Protocol" entry (file "~/org/inbox.org")
                             "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-                           ("L" "Protocol Link" entry (file "~/gtd/inbox.org")
+                           ("L" "Protocol Link" entry (file "~/org/inbox.org")
                             "* %? [[%:link][%:description]] \nCaptured On: %U")))
-  (org-refile-targets '(("~/gtd/todo.org" :maxlevel . 3)
-                        ("~/gtd/tickler.org" :maxlevel . 2)))
+  (org-refile-targets '(("~/org/todo.org" :maxlevel . 3)))
   (org-refile-use-outline-path t)
   (org-outline-path-complete-in-steps nil)
   (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 7))
-  (org-agenda-files '("~/gtd/inbox.org" "~/gtd/todo.org" "~/gtd/tickler.org" "~/gtd/notes.org")))
+  (org-agenda-files '("~/org/inbox.org" "~/org/todo.org")))
 
 ;; Some require statements to suppress some flycheck warnings - I
 ;; mean to prevent byte-compilation errors.
@@ -58,6 +57,14 @@
 (use-package org-protocol)
 
 (use-package org-tempo)
+
+;; active Babel languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((sql . t)
+   (python .t)
+   (emacs-lisp . t)))
+;; add additional languages with '((language . t)))
 
 (provide 'dot-org)
 ;;; dot-org ends here

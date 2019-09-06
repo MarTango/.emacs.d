@@ -7,3 +7,6 @@
 [submodule "site-lisp/phpstan.el"]
 	path = site-lisp/phpstan.el
 	url = https://github.com/emacs-php/phpstan.el
+[submodule "lisp/circleci.el"]
+	path = lisp/circleci.el
+	url = https://github.com/technomancy/circleci.el

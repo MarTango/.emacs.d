@@ -134,9 +134,9 @@
   :ensure t
   :defer t
   :hook
-  (web-mode . emmet-mode)
-  (sgml-mode . emmet-mode)
-  (css-mode . emmet-mode))
+  web-mode
+  sgml-mode
+  css-mode)
 
 ;; JavaScript
 (use-package add-node-modules-path
@@ -149,8 +149,9 @@
 (use-package prettier-js
   :ensure t
   :hook
-  js2-mode
-  web-mode)
+  (js2-mode . prettier-js-mode)
+  (web-mode . prettier-js-mode)
+  (typescript-mode . prettier-js-mode))
 
 (use-package js2-mode
   :ensure t
@@ -180,15 +181,17 @@
     (set (make-local-variable 'company-backends)
          '(company-tide company-files)))
   :config
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (flycheck-add-mode 'tsx-tide 'web-mode)
+  (flycheck-add-mode 'typescript-tide 'web-mode)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
-  (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint)
-  (flycheck-add-next-checker 'typescript-tslint 'tsx-tide)
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  (flycheck-add-next-checker 'javascript-tide '(warning . javascript-eslint) 'append)
+  (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint 'append)
   :hook
   (js2-mode . my/tide-hook)
   (typescript-mode . my/tide-hook)
-  (web-mode . (lambda () (when (string-equal "tsx" (file-name-extension buffer-file-name)) (my/tide-hook)))))
+  (web-mode . (lambda () (when (member (file-name-extension buffer-file-name) '("tsx" "jsx"))
+                           (my/tide-hook)))))
 
 ;; Python
 
@@ -234,8 +237,11 @@
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
 (use-package forge
   :ensure t
+  :custom
+  ;; See https://github.com/magit/ghub/issues/81
+  (ghub-use-workaround-for-emacs-bug 'force)
   ;; :config
-  ;; (setq gnutls-log-level 1) ;; See https://github.com/magit/ghub/issues/81
+  ;; (setq gnutls-log-level 1)
   )
 ;; (use-package magithub :disabled :ensure t :after magit :config (magithub-feature-autoinject t))
 (use-package undo-tree :ensure t :init (global-undo-tree-mode t))

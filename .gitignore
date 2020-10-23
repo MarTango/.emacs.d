@@ -13,6 +13,11 @@ custom.el
 myconfig.el
 .org-id-locations
 anaconda-mode
-magithub
-/geben
 /vendor/
+url/
+emojis/
+forge-database.sqlite
+recentf
+transient
+*.elc
+projectile-

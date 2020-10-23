@@ -7,14 +7,15 @@
 ;; My org-mode related configurations.
 
 ;;; Code:
-(use-package org :ensure org-plus-contrib
+(use-package org :ensure t
   :bind
   (("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
    ("C-c c" . org-capture)
    ("C-c b" . org-iswitchb)
    ("C-c C-x" . org-clock-goto)
-   ("C-'" . org-cycle-agenda-files))
+   ;; ("C-'" . org-cycle-agenda-files)
+   )
   :custom
   (org-directory "~/org")
   (org-capture-templates '(("a" "Add to inbox" entry (file "~/org/inbox.org")
@@ -54,16 +55,19 @@
   :no-require
   :hook (after-init . server-start))
 
-(use-package org-protocol)
+(use-package org-protocol :disabled)
 
 (use-package org-tempo)
+
+(use-package ob-rust)
 
 ;; active Babel languages
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((sql . t)
    (python .t)
-   (emacs-lisp . t)))
+   (emacs-lisp . t)
+   (rust . t)))
 ;; add additional languages with '((language . t)))
 
 (provide 'dot-org)

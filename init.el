@@ -28,9 +28,10 @@
 (require 'package)
 (setq package-enable-at-startup nil
       package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")))
+                         ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ;; ("org" . "http://orgmode.org/elpa/")
+                         ))
 (when (version< emacs-version "27")
   (package-initialize))
 (unless (package-installed-p 'use-package)
@@ -42,8 +43,9 @@
 (require 'bind-key)
 
 ;; Keybindings
-(dolist (folder '("lisp" "site-lisp"))
-        (add-to-list 'load-path (concat user-emacs-directory folder)))
+;; (dolist (folder '("lisp" "site-lisp"))
+;;         (add-to-list 'load-path (concat user-emacs-directory folder)))
+(add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 (line-number-mode t)
 
@@ -161,7 +163,7 @@
 
 (use-package tide
   :ensure t
-  :after (flycheck)
+  :after flycheck
   :custom
   (typescript-indent-level 2)
   (company-tooltip-align-annotations t)
@@ -186,7 +188,8 @@
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (flycheck-add-mode 'typescript-tslint 'web-mode)
   (flycheck-add-next-checker 'javascript-tide '(warning . javascript-eslint) 'append)
-  (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint 'append)
+  ;; (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint 'append)
+  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
   :hook
   (js2-mode . my/tide-hook)
   (typescript-mode . my/tide-hook)
@@ -194,27 +197,35 @@
                            (my/tide-hook)))))
 
 ;; Python
+(defun my/flycheck-mypy--find-project-root (_checker)
+  "Find setup.cfg in a parent directory of the current buffer."
+  ;; This is a workaround for `https://gitlab.com/pycqa/flake8/issues/517'; see
+  ;; also `https://github.com/flycheck/flycheck/issues/1722'
+  (locate-dominating-file (or buffer-file-name default-directory) "mypy.ini"))
+
 
 (use-package anaconda-mode
-  :defer t
   :ensure t
+  :after flycheck
+  :config
+  (flycheck-add-next-checker 'python-pycompile 'python-flake8)
+  (setf (flycheck-checker-get 'python-mypy 'working-directory) #'my/flycheck-mypy--find-project-root)
+  ;; (flycheck-add-mode 'python)
   :hook
   (python-mode . anaconda-mode)
   (python-mode . anaconda-eldoc-mode)
   (python-mode . (lambda ()
                    (add-to-list 'company-backends 'company-anaconda)
-                   (message (buffer-name))
-                   (when (not (string= " *temp*" (buffer-name)))
-                     (flycheck-select-checker 'python-mypy))))
+                   (flycheck-select-checker 'python-pycompile)
+                   (when (and buffer-file-name (string-equal (file-name-extension buffer-file-name) "py"))
+                     (flycheck-select-checker 'python-mypy) ;; can't use this in git blames and non-files
+			)))
   :init
   (use-package company-anaconda :defer t :ensure t :after (company anaconda)))
 
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
-(use-package poetry
-  :ensure t
-  :after python
-  :config (poetry-tracking-mode))
+(use-package poetry :ensure t)
 
 (use-package blacken
   :defer t
@@ -288,7 +299,16 @@
 (use-package ivy-hydra :defer t)
 
 (use-package docker :ensure t)
-(use-package flycheck :ensure t :defer t :init (global-flycheck-mode))
+(use-package kubernetes :ensure t :commands (kubernetes-overview))
+(use-package kubernetes-evil :ensure t :after kubernetes)
+
+(use-package flycheck
+  :ensure t
+  :defer t
+  :init (global-flycheck-mode)
+  :custom
+  (flycheck-flake8rc ".flake8"))
+
 (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
 (use-package eldoc :config (global-eldoc-mode))
 (use-package ace-window
@@ -298,11 +318,8 @@
   :bind
   ("M-i" . 'ace-window))
 
-
-(use-package notmuch
-  :custom (send-mail-function 'mailclient-send-it))
-(use-package org-notmuch :after dot-org notmuch)
-
+;; (use-package notmuch :custom (send-mail-function 'mailclient-send-it))
+;; (use-package org-notmuch :after dot-org notmuch)
 
 (use-package ansi-color
   :init
@@ -312,8 +329,35 @@
      (ansi-color-apply-on-region compilation-filter-start (point)))))
 
 
-(use-package pdf-tools) ;; (pdf-tools-install) with env vars set
+;; (use-package pdf-tools) ;; (pdf-tools-install) with env vars set
 
+
+;; Rust
+
+(use-package flycheck-rust :ensure t)
+
+(use-package rust-mode :ensure t
+  :after flycheck-rust
+  :config
+  (evil-define-key '(normal insert) rust-mode-map
+     (kbd "C-c C-r") 'eglot-rename
+     (kbd "C-h .") 'display-local-help)
+  :hook
+  (rust-mode . rust-enable-format-on-save)
+  (rust-mode . flycheck-rust-setup))
+
+
+(use-package cargo :ensure t)
+(use-package eglot :ensure t
+  :hook
+  (rust-mode . (lambda () (call-interactively #'eglot)))
+  :config
+  (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
+  )
+
+(use-package org-jira :ensure t
+  :custom
+  (jiralib-url "https://acornlab.atlassian.net"))
 
 (provide 'init)
 ;;; init.el ends here

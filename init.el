@@ -1,4 +1,4 @@
-;;; init.el --- MarTango's .emacs -*- coding: utf-8; lexical-binding: t; byte-compile-warnings: (not free-vars noruntime); -*-
+;;; init.el --- MarTango's .emacs -*- coding: utf-8; lexical-binding: t; byte-compile-warnings: (cl-functions); -*-
 
 ;; Description: MarTango's .emacs
 ;; URL: https://github.com/martango/.emacs.d/init.el
@@ -78,8 +78,8 @@
 
 ;; For GPG passphrase stuff
 ;; `brew install gnupg`
-(defvar epa-pinentry-mode)
-(setf epa-pinentry-mode 'loopback)
+(defvar epg-pinentry-mode)
+(setf epg-pinentry-mode 'loopback)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (when (file-exists-p custom-file)
@@ -132,13 +132,15 @@
   :mode "\\.tsx\\'"
   :mode "\\.jsx\\'")
 
-(use-package emmet-mode
-  :ensure t
-  :defer t
-  :hook
-  web-mode
-  sgml-mode
-  css-mode)
+(with-no-warnings
+  (use-package emmet-mode
+    :ensure t
+    :defer t
+    :hook
+    web-mode
+    sgml-mode
+    css-mode)
+  )
 
 ;; JavaScript
 (use-package add-node-modules-path
@@ -203,23 +205,20 @@
   ;; also `https://github.com/flycheck/flycheck/issues/1722'
   (locate-dominating-file (or buffer-file-name default-directory) "mypy.ini"))
 
-
 (use-package anaconda-mode
   :ensure t
-  :after flycheck
+  :after
+  (flycheck gv python)
   :config
-  (flycheck-add-next-checker 'python-pycompile 'python-flake8)
   (setf (flycheck-checker-get 'python-mypy 'working-directory) #'my/flycheck-mypy--find-project-root)
+  (flycheck-add-next-checker 'python-pycompile 'python-flake8)
   ;; (flycheck-add-mode 'python)
   :hook
-  (python-mode . anaconda-mode)
+  python-mode
   (python-mode . anaconda-eldoc-mode)
   (python-mode . (lambda ()
                    (add-to-list 'company-backends 'company-anaconda)
-                   (flycheck-select-checker 'python-pycompile)
-                   (when (and buffer-file-name (string-equal (file-name-extension buffer-file-name) "py"))
-                     (flycheck-select-checker 'python-mypy) ;; can't use this in git blames and non-files
-			)))
+                   (flycheck-select-checker 'python-pycompile)))
   :init
   (use-package company-anaconda :defer t :ensure t :after (company anaconda)))
 
@@ -335,9 +334,10 @@
 ;; Rust
 
 (use-package flycheck-rust :ensure t)
-
 (use-package rust-mode :ensure t
   :after flycheck-rust
+  :init
+  (flycheck-add-mode 'rust-clippy 'rust-mode)
   :config
   (evil-define-key '(normal insert) rust-mode-map
      (kbd "C-c C-r") 'eglot-rename
@@ -347,12 +347,24 @@
   (rust-mode . flycheck-rust-setup))
 
 
+
 (use-package cargo :ensure t)
+
+(defun my/eglot-rust--find-project-root (dir)
+  "Find location of Cargo.toml starting at DIR.
+
+Eglot only uses vcs to find project roots by default"
+  (when-let (root (locate-dominating-file dir "Cargo.toml"))
+    `(transient . ,root)))
+
 (use-package eglot :ensure t
   :hook
   (rust-mode . (lambda () (call-interactively #'eglot)))
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
+  (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
+  ;; (setf (alist-get 'rust-mode eglot-server-programs) "rust-analyzer")
+  (add-to-list 'eglot-server-programs '(rust-mode "rust-analyzer"))
   )
 
 (use-package org-jira :ensure t

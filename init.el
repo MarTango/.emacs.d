@@ -67,10 +67,6 @@
   :config
   (evil-collection-init))
 
-(use-package evil-magit
-  :after (evil magit)
-  :ensure t)
-
 (use-package async :ensure t
   :config
   (setq async-bytecomp-allowed-packages '(all))
@@ -205,22 +201,35 @@
   ;; also `https://github.com/flycheck/flycheck/issues/1722'
   (locate-dominating-file (or buffer-file-name default-directory) "mypy.ini"))
 
+(use-package gv)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode)
+  :custom
+  (flycheck-flake8rc ".flake8"))
+
 (use-package anaconda-mode
   :ensure t
+  :defer t
   :after
-  (flycheck gv python)
+  (gv flycheck python)
   :config
   (setf (flycheck-checker-get 'python-mypy 'working-directory) #'my/flycheck-mypy--find-project-root)
-  (flycheck-add-next-checker 'python-pycompile 'python-flake8)
+  (flycheck-add-next-checker 'python-pycompile '(warning . python-flake8))
+  ;; (flycheck-add-next-checker 'python-pycompile 'python-mypy)
   ;; (flycheck-add-mode 'python)
   :hook
   python-mode
   (python-mode . anaconda-eldoc-mode)
   (python-mode . (lambda ()
                    (add-to-list 'company-backends 'company-anaconda)
-                   (flycheck-select-checker 'python-pycompile)))
-  :init
-  (use-package company-anaconda :defer t :ensure t :after (company anaconda)))
+                   (flycheck-select-checker 'python-pycompile))))
+
+(use-package company-anaconda
+  :defer t
+  :ensure t
+  :after (company anaconda))
 
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
@@ -231,6 +240,11 @@
   :ensure t
   :hook
   (python-mode . blacken-mode))
+
+(use-package python-isort
+  :defer t
+  :ensure t
+  :hook (python-mode . python-isort-on-save-mode))
 
 ;; Other Modes
 
@@ -301,13 +315,6 @@
 (use-package kubernetes :ensure t :commands (kubernetes-overview))
 (use-package kubernetes-evil :ensure t :after kubernetes)
 
-(use-package flycheck
-  :ensure t
-  :defer t
-  :init (global-flycheck-mode)
-  :custom
-  (flycheck-flake8rc ".flake8"))
-
 (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
 (use-package eldoc :config (global-eldoc-mode))
 (use-package ace-window
@@ -354,22 +361,42 @@
   "Find location of Cargo.toml starting at DIR.
 
 Eglot only uses vcs to find project roots by default"
-  (when-let (root (locate-dominating-file dir "Cargo.toml"))
-    `(transient . ,root)))
+  (when-let* ((output
+               (let ((default-directory dir))
+                 (shell-command-to-string "cargo metadata --no-deps --format-version 1")))
+              (js (ignore-errors (json-read-from-string output)))
+              (found (cdr (assq 'workspace_root js))))
+    (cons 'transient  found)))
 
 (use-package eglot :ensure t
   :hook
   (rust-mode . (lambda () (call-interactively #'eglot)))
+  :custom
+  (eglot-autoshutdown t)
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
   (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
   ;; (setf (alist-get 'rust-mode eglot-server-programs) "rust-analyzer")
   (add-to-list 'eglot-server-programs '(rust-mode "rust-analyzer"))
-  )
+  (add-to-list 'eglot-server-programs '(haskell-mode . ("haskell-language-server-wrapper" "--lsp"))))
 
-(use-package org-jira :ensure t
+(use-package org-jira
+  :disabled
+  :ensure t
   :custom
   (jiralib-url "https://acornlab.atlassian.net"))
+
+(use-package server
+  :no-require
+  :hook (after-init . server-start))
+
+(use-package so-long
+  :config (global-so-long-mode))
+
+(use-package mermaid-mode :ensure t)
+(use-package ob-mermaid :ensure t)
+
+(display-time-mode)
 
 (provide 'init)
 ;;; init.el ends here

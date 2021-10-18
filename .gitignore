@@ -21,3 +21,5 @@ recentf
 transient
 *.elc
 projectile-
+projectile.cache
+projectile-bookmarks.eld

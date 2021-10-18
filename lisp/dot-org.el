@@ -17,6 +17,7 @@
    ;; ("C-'" . org-cycle-agenda-files)
    )
   :custom
+  (org-src-preserve-indentation t)
   (org-directory "~/org")
   (org-capture-templates '(("a" "Add to inbox" entry (file "~/org/inbox.org")
                             "* TODO %?\n  :PROPERTIES:\n  :CREATED: %U\n  :END:")
@@ -51,15 +52,10 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
-(use-package server
-  :no-require
-  :hook (after-init . server-start))
-
 (use-package org-protocol :disabled)
-
 (use-package org-tempo)
-
 (use-package ob-rust)
+(use-package ob-graphql)
 
 ;; active Babel languages
 (org-babel-do-load-languages

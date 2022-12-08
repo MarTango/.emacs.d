@@ -63,8 +63,9 @@
  '((sql . t)
    (python .t)
    (emacs-lisp . t)
-   (rust . t)))
+   (rust . t)
+   (shell . t)))
 ;; add additional languages with '((language . t)))
 
 (provide 'dot-org)
-;;; dot-org ends here
+;;; dot-org.el ends here

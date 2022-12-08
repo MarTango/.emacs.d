@@ -65,7 +65,10 @@
 
 (use-package evil-collection :after evil :ensure t
   :config
-  (evil-collection-init))
+  (evil-collection-init)
+  :custom
+  (evil-collection-magit-use-$-for-end-of-line nil)
+  )
 
 (use-package async :ensure t
   :config
@@ -126,7 +129,10 @@
   (css-indent-offset 2)
   :mode "\\.html?\\'"
   :mode "\\.tsx\\'"
-  :mode "\\.jsx\\'")
+  :mode "\\.jsx\\'"
+  :mode "\\.js\\'"
+  :hook
+  (web-mode . (lambda () (flycheck-select-checker 'javascript-eslint))))
 
 (with-no-warnings
   (use-package emmet-mode
@@ -148,18 +154,26 @@
 
 (use-package prettier-js
   :ensure t
+  :disabled
+  :custom
+  (prettier-js-command "prettier")
   :hook
   (js2-mode . prettier-js-mode)
   (web-mode . prettier-js-mode)
   (typescript-mode . prettier-js-mode))
 
+(use-package reformatter :ensure t
+  :init (reformatter-define prettier-fmt :program "prettier"))
+
 (use-package js2-mode
+  :disabled
   :ensure t
   :mode "\\.js\\'"
   :interpreter ("node" . js2-mode)
   :custom (js2-basic-offset 2))
 
 (use-package tide
+  :disabled
   :ensure t
   :after flycheck
   :custom
@@ -181,18 +195,19 @@
     (set (make-local-variable 'company-backends)
          '(company-tide company-files)))
   :config
-  (flycheck-add-mode 'tsx-tide 'web-mode)
-  (flycheck-add-mode 'typescript-tide 'web-mode)
+  ;; (flycheck-add-mode 'tsx-tide 'web-mode)
+  ;; (flycheck-add-mode 'typescript-tide 'web-mode)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
   (flycheck-add-next-checker 'javascript-tide '(warning . javascript-eslint) 'append)
   ;; (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint 'append)
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
   :hook
-  (js2-mode . my/tide-hook)
-  (typescript-mode . my/tide-hook)
-  (web-mode . (lambda () (when (member (file-name-extension buffer-file-name) '("tsx" "jsx"))
-                           (my/tide-hook)))))
+  ;; (js2-mode . my/tide-hook)
+  ;; (typescript-mode . my/tide-hook)
+  ;; (web-mode . (lambda () (when (member (file-name-extension buffer-file-name) '("tsx" "jsx"))
+  ;;                          (my/tide-hook))))
+  )
 
 ;; Python
 (defun my/flycheck-mypy--find-project-root (_checker)
@@ -268,7 +283,8 @@
   ;; (setq gnutls-log-level 1)
   )
 ;; (use-package magithub :disabled :ensure t :after magit :config (magithub-feature-autoinject t))
-(use-package undo-tree :ensure t :init (global-undo-tree-mode t))
+(use-package undo-tree :ensure t :init (global-undo-tree-mode t)
+  :custom (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))))
 
 (use-package company
   :ensure t
@@ -314,6 +330,8 @@
 (use-package docker :ensure t)
 (use-package kubernetes :ensure t :commands (kubernetes-overview))
 (use-package kubernetes-evil :ensure t :after kubernetes)
+(use-package kubel :ensure t :commands (kubel))
+(use-package kubel-evil :ensure t :after kubel)
 
 (use-package yasnippet :ensure t :init (use-package yasnippet-snippets :ensure t))
 (use-package eldoc :config (global-eldoc-mode))
@@ -337,6 +355,22 @@
 
 ;; (use-package pdf-tools) ;; (pdf-tools-install) with env vars set
 
+
+(use-package go-mode :ensure t
+  :init
+  (defun godef--successful-p (output)
+    (not (or (string= "-" output)
+             (string= "godef: no identifier found" output)
+             (string= "godef: no object" output)
+             (go--string-prefix-p "godef: no declaration found for " output)
+             (go--string-prefix-p "godef: err" output)
+             (go--string-prefix-p "error finding import path for " output))))
+  :hook
+  ('before-save . gofmt-before-save))
+
+(use-package company-go :disabled :ensure t
+  :hook go-mode . (lambda ()
+                    (add-to-list 'company-backends 'company-go)))
 
 ;; Rust
 
@@ -368,6 +402,15 @@ Eglot only uses vcs to find project roots by default"
               (found (cdr (assq 'workspace_root js))))
     (cons 'transient  found)))
 
+
+(defun my/project-find-go-module (dir)
+  (when-let ((root (locate-dominating-file dir "go.mod")))
+    (cons 'go-module root)))
+
+(cl-defmethod project-root ((project (head go-module)))
+  (cdr project))
+
+
 (use-package eglot :ensure t
   :hook
   (rust-mode . (lambda () (call-interactively #'eglot)))
@@ -375,8 +418,10 @@ Eglot only uses vcs to find project roots by default"
   (eglot-autoshutdown t)
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
+  (add-hook 'project-find-functions #'my/project-find-go-module)
   (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
   ;; (setf (alist-get 'rust-mode eglot-server-programs) "rust-analyzer")
+  (add-to-list 'eglot-server-programs '(web-mode . ("npx" "flow" "lsp")))
   (add-to-list 'eglot-server-programs '(rust-mode "rust-analyzer"))
   (add-to-list 'eglot-server-programs '(haskell-mode . ("haskell-language-server-wrapper" "--lsp"))))
 
@@ -398,5 +443,54 @@ Eglot only uses vcs to find project roots by default"
 
 (display-time-mode)
 
+(use-package java-mode
+  :defer t
+  :custom
+  (tab-width 2)
+  (c-basic-offset 2)
+  :hook
+  (java-mode . (lambda () (c-set-style "my/java")))
+  :init
+  (c-add-style "my/java"
+               '("java"
+                 (c-offsets-alist (statement-cont . 4)
+                                  (arglist-intro . +))))
+  (flycheck-define-checker my/java-checkstyle
+    "checkstyle for java files"
+    :command ("checkstyle" "-f" "xml" "-c" "/Users/matang/.config/checkstyle/checkstyle.xml" source-original)
+    :error-parser flycheck-parse-checkstyle
+    :modes java-mode
+    :predicate flycheck-buffer-saved-p
+    )
+  )
+
+(use-package eglot-java
+  :init
+  (eglot-java-init)
+  :custom
+  (eldoc-documentation-strategy eldoc-documentation-compose-eagerly))
+
+(use-package eglot-with-flycheck
+  :config
+  (flycheck-add-mode 'eglot 'web-mode)
+  (flycheck-add-mode 'eglot 'java-mode)
+  )
+
+(use-package google-java-format
+  :defer
+  :commands (google-java-format-buffer google-java-format google-java-format-region)
+  :custom
+  (google-java-format-executable "google-java-format"))
+
+
+(use-package files :defer t :custom (require-final-newline t))
+
+(unbind-key "s-t") ;; Mac os changing desktop is slow
+
+
+(use-package editorconfig :ensure t)
+(use-package copilot :load-path "lisp/copilot.el")
+
 (provide 'init)
 ;;; init.el ends here
+(put 'upcase-region 'disabled nil)

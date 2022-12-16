@@ -57,6 +57,10 @@
 (use-package ob-rust)
 (use-package ob-graphql)
 
+
+(add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+(org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
+
 ;; active Babel languages
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -64,7 +68,8 @@
    (python .t)
    (emacs-lisp . t)
    (rust . t)
-   (shell . t)))
+   (shell . t)
+   (plantuml . t)))
 ;; add additional languages with '((language . t)))
 
 (provide 'dot-org)

@@ -365,6 +365,11 @@
              (go--string-prefix-p "godef: no declaration found for " output)
              (go--string-prefix-p "godef: err" output)
              (go--string-prefix-p "error finding import path for " output))))
+  :custom
+  (go-mode-map (make-keymap))  ;; don't want to use godef etc
+  ;; :config
+  ;; (evil-define-key 'normal go-mode-map
+  ;;   (kbd "gd") 'xref-find-definitions)
   :hook
   ('before-save . gofmt-before-save))
 
@@ -416,6 +421,7 @@ Eglot only uses vcs to find project roots by default"
   (rust-mode . (lambda () (call-interactively #'eglot)))
   :custom
   (eglot-autoshutdown t)
+  (eglot-extend-to-xref t)
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
   (add-hook 'project-find-functions #'my/project-find-go-module)
@@ -465,10 +471,11 @@ Eglot only uses vcs to find project roots by default"
   )
 
 (use-package eglot-java
-  :init
-  (eglot-java-init)
-  :custom
-  (eldoc-documentation-strategy eldoc-documentation-compose-eagerly))
+  :hook
+  (java-mode . eglot-java-mode)
+  ;; :custom
+  ;; (eldoc-documentation-strategy eldoc-documentation-compose-eagerly)
+  )
 
 (use-package eglot-with-flycheck
   :config
@@ -491,6 +498,7 @@ Eglot only uses vcs to find project roots by default"
 (use-package editorconfig :ensure t)
 (use-package copilot :load-path "lisp/copilot.el")
 
+(put 'upcase-region 'disabled nil)
+
 (provide 'init)
 ;;; init.el ends here
-(put 'upcase-region 'disabled nil)

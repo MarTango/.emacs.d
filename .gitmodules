@@ -1,0 +1,6 @@
+[submodule "lisp/copilot.el"]
+	path = lisp/copilot.el
+	url = https://github.com/zerolfx/copilot.el
+[submodule "lisp/circleci.el"]
+	path = lisp/circleci.el
+	url = https://github.com/technomancy/circleci.el

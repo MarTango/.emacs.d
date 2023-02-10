@@ -163,7 +163,8 @@
   (typescript-mode . prettier-js-mode))
 
 (use-package reformatter :ensure t
-  :init (reformatter-define prettier-fmt :program "prettier"))
+  :init (reformatter-define prettier-fmt :program "prettier")
+  (reformatter-define gofmt-fmt :program "gofmt"))
 
 (use-package js2-mode
   :disabled
@@ -220,7 +221,12 @@
 
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode)
+  :init
+  (dolist (checker flycheck-checkers)
+    (let ((modes (flycheck-checker-get checker 'modes)))
+      (when (and (member 'go-mode modes) (not (member 'go-ts-mode modes)))
+        (flycheck-add-mode checker 'go-ts-mode))))
+  (global-flycheck-mode)
   :custom
   (flycheck-flake8rc ".flake8"))
 
@@ -229,6 +235,9 @@
   :defer t
   :after
   (gv flycheck python)
+  :custom
+  (python-shell-interpreter "python")
+  ;; (python-shell-completion-native-enable nil)
   :config
   (setf (flycheck-checker-get 'python-mypy 'working-directory) #'my/flycheck-mypy--find-project-root)
   (flycheck-add-next-checker 'python-pycompile '(warning . python-flake8))
@@ -356,25 +365,31 @@
 ;; (use-package pdf-tools) ;; (pdf-tools-install) with env vars set
 
 
-(use-package go-mode :ensure t
-  :init
-  (defun godef--successful-p (output)
-    (not (or (string= "-" output)
-             (string= "godef: no identifier found" output)
-             (string= "godef: no object" output)
-             (go--string-prefix-p "godef: no declaration found for " output)
-             (go--string-prefix-p "godef: err" output)
-             (go--string-prefix-p "error finding import path for " output))))
-  :custom
-  (go-mode-map (make-keymap))  ;; don't want to use godef etc
-  ;; :config
-  ;; (evil-define-key 'normal go-mode-map
-  ;;   (kbd "gd") 'xref-find-definitions)
-  :hook
-  ('before-save . gofmt-before-save))
+;; (use-package go-mode :ensure t
+;;   :init
+;;   (defun godef--successful-p (output)
+;;     (not (or (string= "-" output)
+;;              (string= "godef: no identifier found" output)
+;;              (string= "godef: no object" output)
+;;              (go--string-prefix-p "godef: no declaration found for " output)
+;;              (go--string-prefix-p "godef: err" output)
+;;              (go--string-prefix-p "error finding import path for " output))))
+;;   :custom
+;;   (go-mode-map (make-keymap))  ;; don't want to use godef etc
+;;   ;; :config
+;;   ;; (evil-define-key 'normal go-mode-map
+;;   ;;   (kbd "gd") 'xref-find-definitions)
+;;   :hook
+;;   ('before-save . gofmt-before-save))
+
+(use-package go-ts-mode
+  :custom (go-ts-mode-indent-offset 2)
+  :hook (before-save . gofmt-fmt-buffer))
+
+(use-package treesit)
 
 (use-package company-go :disabled :ensure t
-  :hook go-mode . (lambda ()
+  :hook go-ts-mode . (lambda ()
                     (add-to-list 'company-backends 'company-go)))
 
 ;; Rust
@@ -444,10 +459,14 @@ Eglot only uses vcs to find project roots by default"
 (use-package so-long
   :config (global-so-long-mode))
 
-(use-package mermaid-mode :ensure t)
-(use-package ob-mermaid :ensure t)
+(use-package mermaid-mode :disabled :ensure t)
+(use-package ob-mermaid :disabled :ensure t)
 
 (display-time-mode)
+
+(use-package ob-plantuml
+  :custom
+  (org-plantuml-exec-mode 'plantuml))
 
 (use-package java-mode
   :defer t
@@ -469,10 +488,16 @@ Eglot only uses vcs to find project roots by default"
     :predicate flycheck-buffer-saved-p
     )
   )
+(use-package java-ts-mode)
 
 (use-package eglot-java
+  :ensure t
+  :init
+  ;; ignore the jenv version for jdtls
+  (add-to-list 'exec-path "/Library/Java/JavaVirtualMachines/openjdk-19.jdk/Contents/Home/bin")
   :hook
   (java-mode . eglot-java-mode)
+  (java-ts-mode . eglot-java-mode)
   ;; :custom
   ;; (eldoc-documentation-strategy eldoc-documentation-compose-eagerly)
   )
@@ -499,6 +524,9 @@ Eglot only uses vcs to find project roots by default"
 (use-package copilot :load-path "lisp/copilot.el")
 
 (put 'upcase-region 'disabled nil)
+
+
+(use-package protobuf-ts-mode :ensure t)
 
 (provide 'init)
 ;;; init.el ends here

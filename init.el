@@ -45,7 +45,8 @@
 ;; Keybindings
 ;; (dolist (folder '("lisp" "site-lisp"))
 ;;         (add-to-list 'load-path (concat user-emacs-directory folder)))
-(add-to-list 'load-path (concat user-emacs-directory "lisp"))
+;; not needed since we use the :load-path keyword in use-package?
+;; (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 (line-number-mode t)
 
@@ -166,49 +167,49 @@
   :init (reformatter-define prettier-fmt :program "prettier")
   (reformatter-define gofmt-fmt :program "gofmt"))
 
-(use-package js2-mode
-  :disabled
-  :ensure t
-  :mode "\\.js\\'"
-  :interpreter ("node" . js2-mode)
-  :custom (js2-basic-offset 2))
+;; (use-package js2-mode
+;;   :disabled
+;;   :ensure t
+;;   :mode "\\.js\\'"
+;;   :interpreter ("node" . js2-mode)
+;;   :custom (js2-basic-offset 2))
 
-(use-package tide
-  :disabled
-  :ensure t
-  :after flycheck
-  :custom
-  (typescript-indent-level 2)
-  (company-tooltip-align-annotations t)
-  (flycheck-check-syntax-automatically '(save mode-enabled))
-  (tide-format-options
-   (list :indentSize 2))
-  :bind (:map tide-mode-map
-              ("C-c C-r" . tide-rename-symbol)
-              ("C-c r" . tide-refactor)
-              ("C-M-i" . company-complete)
-              ("M-r" . tide-references))
-  :init
-  (defun my/tide-hook ()
-    (tide-setup)
-    (tide-hl-identifier-mode)
-    ;; (flycheck-select-checker 'typescript-tslint)
-    (set (make-local-variable 'company-backends)
-         '(company-tide company-files)))
-  :config
-  ;; (flycheck-add-mode 'tsx-tide 'web-mode)
-  ;; (flycheck-add-mode 'typescript-tide 'web-mode)
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-  ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
-  (flycheck-add-next-checker 'javascript-tide '(warning . javascript-eslint) 'append)
-  ;; (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint 'append)
-  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
-  :hook
-  ;; (js2-mode . my/tide-hook)
-  ;; (typescript-mode . my/tide-hook)
-  ;; (web-mode . (lambda () (when (member (file-name-extension buffer-file-name) '("tsx" "jsx"))
-  ;;                          (my/tide-hook))))
-  )
+;; (use-package tide
+;;   :disabled
+;;   :ensure t
+;;   :after flycheck
+;;   :custom
+;;   (typescript-indent-level 2)
+;;   (company-tooltip-align-annotations t)
+;;   (flycheck-check-syntax-automatically '(save mode-enabled))
+;;   (tide-format-options
+;;    (list :indentSize 2))
+;;   :bind (:map tide-mode-map
+;;               ("C-c C-r" . tide-rename-symbol)
+;;               ("C-c r" . tide-refactor)
+;;               ("C-M-i" . company-complete)
+;;               ("M-r" . tide-references))
+;;   :init
+;;   (defun my/tide-hook ()
+;;     (tide-setup)
+;;     (tide-hl-identifier-mode)
+;;     ;; (flycheck-select-checker 'typescript-tslint)
+;;     (set (make-local-variable 'company-backends)
+;;          '(company-tide company-files)))
+;;   :config
+;;   ;; (flycheck-add-mode 'tsx-tide 'web-mode)
+;;   ;; (flycheck-add-mode 'typescript-tide 'web-mode)
+;;   (flycheck-add-mode 'javascript-eslint 'web-mode)
+;;   ;; (flycheck-add-mode 'typescript-tslint 'web-mode)
+;;   (flycheck-add-next-checker 'javascript-tide '(warning . javascript-eslint) 'append)
+;;   ;; (flycheck-add-next-checker 'typescript-tslint 'javascript-eslint 'append)
+;;   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint)
+;;   :hook
+;;   ;; (js2-mode . my/tide-hook)
+;;   ;; (typescript-mode . my/tide-hook)
+;;   ;; (web-mode . (lambda () (when (member (file-name-extension buffer-file-name) '("tsx" "jsx"))
+;;   ;;                          (my/tide-hook))))
+;;   )
 
 ;; Python
 (defun my/flycheck-mypy--find-project-root (_checker)
@@ -244,6 +245,7 @@
   ;; (flycheck-add-next-checker 'python-pycompile 'python-mypy)
   ;; (flycheck-add-mode 'python)
   :hook
+  python-ts-mode
   python-mode
   (python-mode . anaconda-eldoc-mode)
   (python-mode . (lambda ()
@@ -279,7 +281,7 @@
 (use-package graphql-mode :ensure t :defer t)
 
 ;; Org-Mode
-(use-package dot-org)
+(use-package dot-org :load-path "lisp")
 
 ;; Useful Tools
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
@@ -503,12 +505,14 @@ Eglot only uses vcs to find project roots by default"
   )
 
 (use-package eglot-with-flycheck
+  :load-path "lisp"
   :config
   (flycheck-add-mode 'eglot 'web-mode)
   (flycheck-add-mode 'eglot 'java-mode)
   )
 
 (use-package google-java-format
+  :load-path "lisp"
   :defer
   :commands (google-java-format-buffer google-java-format google-java-format-region)
   :custom
@@ -521,10 +525,11 @@ Eglot only uses vcs to find project roots by default"
 
 
 (use-package editorconfig :ensure t)
-(use-package copilot :load-path "lisp/copilot.el")
+
+(use-package copilot
+  :load-path "lisp/copilot.el")
 
 (put 'upcase-region 'disabled nil)
-
 
 (use-package protobuf-ts-mode :ensure t)
 

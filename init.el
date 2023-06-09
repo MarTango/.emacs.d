@@ -128,10 +128,10 @@
   (web-mode-markup-indent-offset 2)
   (web-mode-enable-auto-quoting nil)
   (css-indent-offset 2)
-  :mode "\\.html?\\'"
-  :mode "\\.tsx\\'"
-  :mode "\\.jsx\\'"
-  :mode "\\.js\\'"
+  ;; :mode "\\.html?\\'"
+  ;; :mode "\\.tsx\\'"
+  ;; :mode "\\.jsx\\'"
+  ;; :mode "\\.js\\'"
   :hook
   (web-mode . (lambda () (flycheck-select-checker 'javascript-eslint))))
 
@@ -152,6 +152,8 @@
   js2-mode
   tide-mode
   web-mode)
+
+;; (use-package js-ts-mode)
 
 (use-package prettier-js
   :ensure t
@@ -386,7 +388,7 @@
 
 (use-package go-ts-mode
   :custom (go-ts-mode-indent-offset 2)
-  :hook (before-save . gofmt-fmt-buffer))
+  :hook (before-save . (lambda () (when (eq major-mode 'go-ts-mode) gofmt-fmt-buffer))))
 
 (use-package treesit)
 
@@ -439,13 +441,18 @@ Eglot only uses vcs to find project roots by default"
   :custom
   (eglot-autoshutdown t)
   (eglot-extend-to-xref t)
+  :init
+  (add-hook 'before-save-hook #'eglot-format)
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
   (add-hook 'project-find-functions #'my/project-find-go-module)
   (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
   ;; (setf (alist-get 'rust-mode eglot-server-programs) "rust-analyzer")
-  (add-to-list 'eglot-server-programs '(web-mode . ("npx" "flow" "lsp")))
-  (add-to-list 'eglot-server-programs '(rust-mode "rust-analyzer"))
+  (add-to-list 'eglot-server-programs '((java-ts-mode java-mode) . (lambda (_) `("jdtls"
+                                                                      "-config" "/usr/local/Cellar/jdtls/1.19.0/libexec/config_mac"
+                                                                      "-data" ,(expand-file-name (md5 (project-root (eglot--current-project)))
+                                                                                                (locate-user-emacs-file "eglot-eclipse-jdt-cache"))))))
+  ;; (add-to-list 'eglot-server-programs '(web-mode . ("npx" "flow" "lsp")))
   (add-to-list 'eglot-server-programs '(haskell-mode . ("haskell-language-server-wrapper" "--lsp"))))
 
 (use-package org-jira
@@ -493,6 +500,7 @@ Eglot only uses vcs to find project roots by default"
 (use-package java-ts-mode)
 
 (use-package eglot-java
+  :disabled
   :ensure t
   :init
   ;; ignore the jenv version for jdtls
@@ -500,8 +508,8 @@ Eglot only uses vcs to find project roots by default"
   :hook
   (java-mode . eglot-java-mode)
   (java-ts-mode . eglot-java-mode)
-  ;; :custom
-  ;; (eldoc-documentation-strategy eldoc-documentation-compose-eagerly)
+  :custom
+  (eldoc-documentation-strategy eldoc-documentation-compose-eagerly)
   )
 
 (use-package eglot-with-flycheck

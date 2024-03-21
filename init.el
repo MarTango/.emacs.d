@@ -224,7 +224,7 @@
 
 (use-package flycheck
   :ensure t
-  :init
+  :config
   (dolist (checker flycheck-checkers)
     (let ((modes (flycheck-checker-get checker 'modes)))
       (when (and (member 'go-mode modes) (not (member 'go-ts-mode modes)))
@@ -387,8 +387,13 @@
 ;;   ('before-save . gofmt-before-save))
 
 (use-package go-ts-mode
-  :custom (go-ts-mode-indent-offset 2)
-  :hook (before-save . (lambda () (when (eq major-mode 'go-ts-mode) gofmt-fmt-buffer))))
+  :custom
+  (tab-width 2)
+  (go-ts-mode-indent-offset 2)
+  :hook
+  (before-save . (lambda () (when (eq major-mode 'go-ts-mode) gofmt-fmt-buffer))))
+
+(use-package gotest :ensure t)
 
 (use-package treesit)
 
@@ -437,23 +442,28 @@ Eglot only uses vcs to find project roots by default"
 
 (use-package eglot :ensure t
   :hook
-  (rust-mode . (lambda () (call-interactively #'eglot)))
+  ;; (rust-mode . (lambda () (call-interactively #'eglot)))
+  (before-save . eglot-format-buffer)
   :custom
   (eglot-autoshutdown t)
   (eglot-extend-to-xref t)
-  :init
-  (add-hook 'before-save-hook #'eglot-format)
+  (next-error-function flymake-goto-next-error)
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
   (add-hook 'project-find-functions #'my/project-find-go-module)
-  (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
+  (define-key eglot-mode-map (kbd "C-c C-r") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
+  ;; (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
   ;; (setf (alist-get 'rust-mode eglot-server-programs) "rust-analyzer")
-  (add-to-list 'eglot-server-programs '((java-ts-mode java-mode) . (lambda (_) `("jdtls"
-                                                                      "-config" "/usr/local/Cellar/jdtls/1.19.0/libexec/config_mac"
-                                                                      "-data" ,(expand-file-name (md5 (project-root (eglot--current-project)))
-                                                                                                (locate-user-emacs-file "eglot-eclipse-jdt-cache"))))))
+  ;; (add-to-list 'eglot-server-programs '((java-ts-mode java-mode) . (lambda (_) `("jdtls"
+  ;;                                                                     "-config" "/usr/local/Cellar/jdtls/1.19.0/libexec/config_mac"
+  ;;                                                                     "-data" ,(expand-file-name (md5 (project-root (eglot--current-project)))
+  ;;                                                                                               (locate-user-emacs-file "eglot-eclipse-jdt-cache"))))))
   ;; (add-to-list 'eglot-server-programs '(web-mode . ("npx" "flow" "lsp")))
-  (add-to-list 'eglot-server-programs '(haskell-mode . ("haskell-language-server-wrapper" "--lsp"))))
+  (add-to-list 'eglot-server-programs '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
+  (add-to-list 'eglot-server-programs '(sql-mode . ("flink-sql-language-service" "serve")))
+  )
+
 
 (use-package org-jira
   :disabled
@@ -472,6 +482,9 @@ Eglot only uses vcs to find project roots by default"
 (use-package ob-mermaid :disabled :ensure t)
 
 (display-time-mode)
+
+(use-package plantuml-mode :ensure t)
+(use-package flycheck-plantuml :ensure t)
 
 (use-package ob-plantuml
   :custom
@@ -497,6 +510,8 @@ Eglot only uses vcs to find project roots by default"
     :predicate flycheck-buffer-saved-p
     )
   )
+
+(use-package gradle-mode :ensure t)
 (use-package java-ts-mode)
 
 (use-package eglot-java
@@ -513,6 +528,7 @@ Eglot only uses vcs to find project roots by default"
   )
 
 (use-package eglot-with-flycheck
+  :disabled
   :load-path "lisp"
   :config
   (flycheck-add-mode 'eglot 'web-mode)
@@ -532,7 +548,10 @@ Eglot only uses vcs to find project roots by default"
 (unbind-key "s-t") ;; Mac os changing desktop is slow
 
 
-(use-package editorconfig :ensure t)
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
 
 (use-package copilot
   :load-path "lisp/copilot.el")
@@ -540,6 +559,10 @@ Eglot only uses vcs to find project roots by default"
 (put 'upcase-region 'disabled nil)
 
 (use-package protobuf-ts-mode :ensure t)
+
+(use-package flymake-mode
+  :bind (("M-n" . flymake-goto-next-error)
+         ("M-p" . flymake-goto-prev-error)))
 
 (provide 'init)
 ;;; init.el ends here

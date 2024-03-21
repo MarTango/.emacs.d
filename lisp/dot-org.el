@@ -55,8 +55,8 @@
 
 (use-package org-protocol :disabled)
 (use-package org-tempo)
-(use-package ob-rust)
-(use-package ob-graphql)
+;; (use-package ob-rust)
+;; (use-package ob-graphql)
 
 
 (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))

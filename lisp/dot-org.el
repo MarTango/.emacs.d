@@ -68,7 +68,7 @@
  '((sql . t)
    (python .t)
    (emacs-lisp . t)
-   (rust . t)
+   ;;(rust . t)
    (shell . t)
    (plantuml . t)))
 ;; add additional languages with '((language . t)))

@@ -166,8 +166,9 @@
   (typescript-mode . prettier-js-mode))
 
 (use-package reformatter :ensure t
-  :init (reformatter-define prettier-fmt :program "prettier")
-  (reformatter-define gofmt-fmt :program "gofmt"))
+  :init
+  (reformatter-define prettier-fmt :program "prettier" :group 'emacs)
+  (reformatter-define gofmt-fmt :program "gofmt" :group 'go))
 
 ;; (use-package js2-mode
 ;;   :disabled
@@ -232,6 +233,11 @@
   (global-flycheck-mode)
   :custom
   (flycheck-flake8rc ".flake8"))
+
+(use-package flycheck-golangci-lint
+  :ensure t
+  :config (flycheck-add-mode 'golangci-lint 'go-ts-mode)
+  :hook (go-ts-mode . flycheck-golangci-lint-setup))
 
 (use-package anaconda-mode
   :ensure t
@@ -408,6 +414,7 @@
   :after flycheck-rust
   :init
   (flycheck-add-mode 'rust-clippy 'rust-mode)
+  (evil-define-key 'normal 'global-map (kbd "C-=")  #'eglot)
   :config
   (evil-define-key '(normal insert) rust-mode-map
      (kbd "C-c C-r") 'eglot-rename
@@ -464,6 +471,47 @@ Eglot only uses vcs to find project roots by default"
   (add-to-list 'eglot-server-programs '(sql-mode . ("flink-sql-language-service" "serve")))
   )
 
+(use-package dape
+  :ensure
+  :preface
+  ;; By default dape shares the same keybinding prefix as `gud'
+  ;; If you do not want to use any prefix, set it to nil.
+  ;; (setq dape-key-prefix "\C-x\C-a")
+
+  :hook
+  ;; Save breakpoints on quit
+  ((kill-emacs . dape-breakpoint-save)
+  ;; Load breakpoints on startup
+   (after-init . dape-breakpoint-load))
+
+  ;; :init
+  ;; ;; To use window configuration like gud (gdb-mi)
+  ;; ;; (setq dape-buffer-window-arrangement 'gud)
+
+  ;; :config
+  ;; ;; Info buffers to the right
+  ;; ;; (setq dape-buffer-window-arrangement 'right)
+
+  ;; Global bindings for setting breakpoints with mouse
+  ;; (dape-breakpoint-global-mode)
+
+  ;; To not display info and/or buffers on startup
+  ;; (remove-hook 'dape-on-start-hooks 'dape-info)
+  ;; (remove-hook 'dape-on-start-hooks 'dape-repl)
+
+  ;; To display info and/or repl buffers on stopped
+  ;; (add-hook 'dape-on-stopped-hooks 'dape-info)
+  ;; (add-hook 'dape-on-stopped-hooks 'dape-repl)
+
+  ;; Kill compile buffer on build success
+  ;; (add-hook 'dape-compile-compile-hooks 'kill-buffer)
+
+  ;; Save buffers on startup, useful for interpreted languages
+  ;; (add-hook 'dape-on-start-hooks (lambda () (save-some-buffers t t)))
+
+  ;; Projectile users
+  ;; (setq dape-cwd-fn 'projectile-project-root)
+  )
 
 (use-package org-jira
   :disabled
@@ -519,13 +567,12 @@ Eglot only uses vcs to find project roots by default"
   :ensure t
   :init
   ;; ignore the jenv version for jdtls
-  (add-to-list 'exec-path "/Library/Java/JavaVirtualMachines/openjdk-19.jdk/Contents/Home/bin")
+  ;; (add-to-list 'exec-path "/Library/Java/JavaVirtualMachines/openjdk-19.jdk/Contents/Home/bin")
   :hook
   (java-mode . eglot-java-mode)
   (java-ts-mode . eglot-java-mode)
   :custom
-  (eldoc-documentation-strategy eldoc-documentation-compose-eagerly)
-  )
+  (eldoc-documentation-strategy eldoc-documentation-compose-eagerly))
 
 (use-package eglot-with-flycheck
   :disabled

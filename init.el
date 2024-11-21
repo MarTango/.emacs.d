@@ -295,9 +295,9 @@
 (use-package magit :ensure t :defer t :bind (("C-x g" . magit-status)))
 (use-package forge
   :ensure t
-  :custom
+  ;; :custom
   ;; See https://github.com/magit/ghub/issues/81
-  (ghub-use-workaround-for-emacs-bug 'force)
+  ;; (ghub-use-workaround-for-emacs-bug 'force)
   ;; :config
   ;; (setq gnutls-log-level 1)
   )
@@ -374,24 +374,6 @@
 
 ;; (use-package pdf-tools) ;; (pdf-tools-install) with env vars set
 
-
-;; (use-package go-mode :ensure t
-;;   :init
-;;   (defun godef--successful-p (output)
-;;     (not (or (string= "-" output)
-;;              (string= "godef: no identifier found" output)
-;;              (string= "godef: no object" output)
-;;              (go--string-prefix-p "godef: no declaration found for " output)
-;;              (go--string-prefix-p "godef: err" output)
-;;              (go--string-prefix-p "error finding import path for " output))))
-;;   :custom
-;;   (go-mode-map (make-keymap))  ;; don't want to use godef etc
-;;   ;; :config
-;;   ;; (evil-define-key 'normal go-mode-map
-;;   ;;   (kbd "gd") 'xref-find-definitions)
-;;   :hook
-;;   ('before-save . gofmt-before-save))
-
 (use-package go-ts-mode
   :custom
   (tab-width 2)
@@ -438,86 +420,38 @@ Eglot only uses vcs to find project roots by default"
               (found (cdr (assq 'workspace_root js))))
     (cons 'transient  found)))
 
+;; (defun my/project-find-go-module (dir)
+;;   (when-let ((root (locate-dominating-file dir "go.mod")))
+;;     (cons 'go-module root)))
 
-(defun my/project-find-go-module (dir)
-  (when-let ((root (locate-dominating-file dir "go.mod")))
-    (cons 'go-module root)))
-
-(cl-defmethod project-root ((project (head go-module)))
-  (cdr project))
+;; (cl-defmethod project-root ((project (head go-module)))
+;;   (cdr project))
 
 
 (use-package eglot :ensure t
+  :after flymake
   :hook
-  ;; (rust-mode . (lambda () (call-interactively #'eglot)))
   (before-save . eglot-format-buffer)
   :custom
   (eglot-autoshutdown t)
   (eglot-extend-to-xref t)
-  (next-error-function flymake-goto-next-error)
+  (next-error-function #'flymake-goto-next-error)
   :config
   (define-key eglot-mode-map [remap display-local-help] nil) ;; https://github.com/joaotavora/eglot/issues/454
-  (add-hook 'project-find-functions #'my/project-find-go-module)
+  ;; (add-hook 'project-find-functions #'my/project-find-go-module)
   (define-key eglot-mode-map (kbd "C-c C-r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
-  ;; (add-hook 'project-find-functions #'my/eglot-rust--find-project-root)
-  ;; (setf (alist-get 'rust-mode eglot-server-programs) "rust-analyzer")
-  ;; (add-to-list 'eglot-server-programs '((java-ts-mode java-mode) . (lambda (_) `("jdtls"
-  ;;                                                                     "-config" "/usr/local/Cellar/jdtls/1.19.0/libexec/config_mac"
-  ;;                                                                     "-data" ,(expand-file-name (md5 (project-root (eglot--current-project)))
-  ;;                                                                                               (locate-user-emacs-file "eglot-eclipse-jdt-cache"))))))
-  ;; (add-to-list 'eglot-server-programs '(web-mode . ("npx" "flow" "lsp")))
-  (add-to-list 'eglot-server-programs '(haskell-mode . ("haskell-language-server-wrapper" "--lsp")))
-  (add-to-list 'eglot-server-programs '(sql-mode . ("flink-sql-language-service" "serve")))
   )
 
-(use-package dape
-  :ensure
-  :preface
-  ;; By default dape shares the same keybinding prefix as `gud'
-  ;; If you do not want to use any prefix, set it to nil.
-  ;; (setq dape-key-prefix "\C-x\C-a")
-
-  :hook
-  ;; Save breakpoints on quit
-  ((kill-emacs . dape-breakpoint-save)
-  ;; Load breakpoints on startup
-   (after-init . dape-breakpoint-load))
-
-  ;; :init
-  ;; ;; To use window configuration like gud (gdb-mi)
-  ;; ;; (setq dape-buffer-window-arrangement 'gud)
-
-  ;; :config
-  ;; ;; Info buffers to the right
-  ;; ;; (setq dape-buffer-window-arrangement 'right)
-
-  ;; Global bindings for setting breakpoints with mouse
-  ;; (dape-breakpoint-global-mode)
-
-  ;; To not display info and/or buffers on startup
-  ;; (remove-hook 'dape-on-start-hooks 'dape-info)
-  ;; (remove-hook 'dape-on-start-hooks 'dape-repl)
-
-  ;; To display info and/or repl buffers on stopped
-  ;; (add-hook 'dape-on-stopped-hooks 'dape-info)
-  ;; (add-hook 'dape-on-stopped-hooks 'dape-repl)
-
-  ;; Kill compile buffer on build success
-  ;; (add-hook 'dape-compile-compile-hooks 'kill-buffer)
-
-  ;; Save buffers on startup, useful for interpreted languages
-  ;; (add-hook 'dape-on-start-hooks (lambda () (save-some-buffers t t)))
-
-  ;; Projectile users
-  ;; (setq dape-cwd-fn 'projectile-project-root)
-  )
+(use-package eglot-java
+  :ensure t
+  :hook java-ts-mode)
 
 (use-package org-jira
   :disabled
   :ensure t
   :custom
-  (jiralib-url "https://acornlab.atlassian.net"))
+  (jiralib-url "https://confluentinc.atlassian.net"))
 
 (use-package server
   :no-require
@@ -538,41 +472,8 @@ Eglot only uses vcs to find project roots by default"
   :custom
   (org-plantuml-exec-mode 'plantuml))
 
-(use-package java-mode
-  :defer t
-  :custom
-  (tab-width 2)
-  (c-basic-offset 2)
-  :hook
-  (java-mode . (lambda () (c-set-style "my/java")))
-  :init
-  (c-add-style "my/java"
-               '("java"
-                 (c-offsets-alist (statement-cont . 4)
-                                  (arglist-intro . +))))
-  (flycheck-define-checker my/java-checkstyle
-    "checkstyle for java files"
-    :command ("checkstyle" "-f" "xml" "-c" "/Users/matang/.config/checkstyle/checkstyle.xml" source-original)
-    :error-parser flycheck-parse-checkstyle
-    :modes java-mode
-    :predicate flycheck-buffer-saved-p
-    )
-  )
-
 (use-package gradle-mode :ensure t)
-(use-package java-ts-mode)
-
-(use-package eglot-java
-  :disabled
-  :ensure t
-  :init
-  ;; ignore the jenv version for jdtls
-  ;; (add-to-list 'exec-path "/Library/Java/JavaVirtualMachines/openjdk-19.jdk/Contents/Home/bin")
-  :hook
-  (java-mode . eglot-java-mode)
-  (java-ts-mode . eglot-java-mode)
-  :custom
-  (eldoc-documentation-strategy eldoc-documentation-compose-eagerly))
+(use-package java-ts-mode :custom java-ts-mode-indent-offset 2)
 
 (use-package eglot-with-flycheck
   :disabled
@@ -601,7 +502,19 @@ Eglot only uses vcs to find project roots by default"
   (editorconfig-mode 1))
 
 (use-package copilot
-  :load-path "lisp/copilot.el")
+  :vc (:url "https://github.com/copilot-emacs/copilot.el"
+            :rev :newest
+            :branch "main")
+  :config
+  (defun my/copilot-tab-or-default ()
+    (interactive)
+    (if (and (bound-and-true-p copilot-mode)
+             ;; Add any other conditions to check for active copilot suggestions if necessary
+             )
+        (copilot-accept-completion)
+      (evil-insert 1)))
+  (evil-define-key 'insert 'global (kbd "C-<tab>") 'my/copilot-tab-or-default)
+  :hook prog-mode)
 
 (put 'upcase-region 'disabled nil)
 
